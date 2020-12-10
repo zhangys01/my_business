@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.business.dao.TableManagerDao">
+
+    <delete id="deleteByJobtaskId" parameterType="String" >
+		delete from gt_m_l2,gt_r_l2,gt_m_l1,gt_r_l1,gt_m_cat,gt_m_l0,gt_r_l0,gt_m_r0 where jobtaskId=#{jobtaskId}
+	</delete>
+	<delete id="deleteByTaskId" parameterType="String" >
+
+	</delete>
+</mapper>
