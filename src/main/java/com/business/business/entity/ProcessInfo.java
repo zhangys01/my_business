@@ -14,6 +14,8 @@ public class ProcessInfo {
 
     @TableId(value = "orderId")
     private String orderId;
+    @TableField(value = "processId")
+    private String processId;
     @TableField(value = "processType")
     private String processType;
     @TableField(value = "processName")

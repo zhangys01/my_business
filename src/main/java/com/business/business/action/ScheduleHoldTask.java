@@ -27,6 +27,8 @@ public class ScheduleHoldTask {
     private WorkFlowOrderService orderService;
     @Resource
     DataArchiveAction dataArchiveAction;
+    @Resource
+    QATaskAction qaTaskAction;
     //3.添加定时任务
     @Scheduled(cron = "0/5 * * * * ?")
     public void configureTasks()throws Exception{
@@ -45,7 +47,6 @@ public class ScheduleHoldTask {
                     switch (orderType){
                         case "QATask":
                             orderService.updateById(order);
-                            QATaskAction qaTaskAction = new QATaskAction();
                             qaTaskAction.process(order);
                             break;
                         case "DATask":
@@ -63,6 +64,7 @@ public class ScheduleHoldTask {
         }
         }
     public synchronized boolean processDATask(WorkflowOrder t)throws Exception{
+        Config.loadConfig();
         boolean result = false;
         try{
             //todo 三种情况

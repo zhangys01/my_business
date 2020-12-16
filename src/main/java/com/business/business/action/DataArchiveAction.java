@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileFilter;
 import java.nio.file.Files;
@@ -33,13 +34,13 @@ import java.util.*;
 public class DataArchiveAction {
     private static final Logger logger = Logger.getLogger(DataArchiveAction.class);
     @Autowired
-    private WorkFlowOrderService orderService;
-    @Autowired
     private TableManagerService tableManagerService;
     @Autowired
     private UnzipConfirmService unzipConfirmService;
     @Autowired
     private UnzipConfigService unzipConfigService;
+    @Resource
+    ProcessUtil processUtil;
     public void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
         File[] datFiles = dataTmpDir.listFiles(new FileFilter() {
             @Override
@@ -89,7 +90,7 @@ public class DataArchiveAction {
         }
         //提交订单。注意，先提交解压缩流程（因为解压缩流程占用资源多，先提交可能会让其先占用到资源）
         //todo 建一个线程，查processInfo表
-         ProcessUtil.submitProcess(unzipOrderXml, Config.submit_order_timeout);
+        processUtil.submitProcess(unzipOrderXml, Config.submit_order_timeout);
         //TODO 启动检查线程
         Thread.sleep(25000);
     }

@@ -1,17 +1,18 @@
 package com.business.business.action;
 
 
+import com.business.business.Service.McatManagerService;
 import com.business.business.Service.WorkFlowOrderService;
 import com.business.business.config.Config;
+import com.business.business.entity.Mcat;
 import com.business.business.entity.WorkflowOrder;
-import com.business.business.enums.ProcessType;
-import com.business.business.enums.ResponseType;
-import com.business.business.enums.TaskMode;
+import com.business.business.enums.*;
 import com.business.business.util.ProcessUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -37,12 +38,14 @@ public class QATaskAction{
     //todo 每个action都创建新实例，因此域变量不会共享冲突
     private String QAReportFile;    //相对路径
     private Integer sceneCountQ63;
+    @Resource
+    ProcessUtil processUtil;
     @Autowired
     private WorkFlowOrderService orderService;
+    @Autowired
+    private McatManagerService mcatManagerService;
     public  void process(WorkflowOrder order)throws Exception{
-        List<WorkflowOrder> orderList = orderService.selectList("7");
-        System.out.println(orderList);
-      /*  String taskMode = order.taskMode;
+        String taskMode = order.taskMode;
         if (order.getTaskStatus().equals("New")){
             try{
                 //先生成报告文件路径
@@ -71,7 +74,7 @@ public class QATaskAction{
                         orderParams = generateOrderParamsForGF_Q65(order,time);
                         //构建流程订单
                         String orderXml = processType.generateOrderXml(orderParams);
-                        orderId = ProcessUtil.submitProcess(orderXml, Config.submit_order_timeout);
+                        processUtil.submitProcess(orderXml, Config.submit_order_timeout);
                         //todo 提交流程 by 2019/2/22 kiven
                         //记录流程信息。如果记录失败，前面提交的工作流仍然会处理，只是生成垃圾数据
                         QATaskWorkFlow qatask = new QATaskWorkFlow();
@@ -94,8 +97,8 @@ public class QATaskAction{
                             case "ZY-3B":
                             case"CSES":
                                 //todo 归档任务不发起R0Report任务
-                              *//*  List<gtrR0> gtrR0List = gtrR0Manager.listByJobId(order.getJobTaskID());
-                                if (gtrR0List.size()==0){*//*
+                                List<gtrR0> gtrR0List = gtrR0Manager.listByJobId(order.getJobTaskID());
+                                if (gtrR0List.size()==0){
                                     //todo S1Fili和S2File 查询集中存储？
                                     List<String> subOrderIds = new ArrayList<>();
                                     List<String> subInfos = new ArrayList<>();
@@ -139,7 +142,7 @@ public class QATaskAction{
                                    // treeManager.saveTreeSubWorkFlow(order.getTaskSerialNumber(),DateUtil.getTime(),subOrderIds,subInfos);
                                 }
                                     break;
-                                *//*}*//*
+                                }
                         }
                     }
                      if (taskMode.contains("Q62")){
@@ -177,13 +180,13 @@ public class QATaskAction{
              //   db.updateQATaskWorkflowCancel(order.getTaskSerialNumber());
                 //todo 再依次取消该任务下的所有流程
                 //工作流目前没有取消接口，因此子流程并未真正取消，只是处理完后不生成完成通知回复运管而已！
-                *//*for (String orderId: orderIdList) {
+                for (String orderId: orderIdList) {
                     try {
                         ProcessUtil.cancelProcess(orderId);
                     } catch (Throwable ee) { //取消失败也不要抛异常，仅记录日志。对外就当取消成功。因为reply状态已更新为取消
                         logger.warn("cannot cancel process-order : " + orderId, ee);
                     }
-                }*//*
+                }
                 con.taskConStatus = TaskConStatus.Accepted;
             } catch (Throwable e) {
                 logger.error("cannot cancel QATask : "+order.getTaskSerialNumber(),e);
@@ -194,16 +197,6 @@ public class QATaskAction{
 
     }
     private Map<String,Object> generateOrderParamsForGF_R0_TO_R0REPORT(String satellite,WorkflowOrder order,File signalFile,String time) throws Exception {
-        *//**
-         *  %YYYYMMDD_XXXXXX%   订单ID后缀
-         *  %SATELLITE%        卫星简称：GF01/GF02
-         *  %CHANNEL%        通道标识：S1/S2
-         *  %JOBTASKID%      jobTaskId
-         *  %SIGNALID%       signalID
-         *  %SIGNALFILE%    原始码流数据文件绝对路径
-         *  %PINFILE%            pinfile文件名（根据星种不同配置）
-         *  %REPORT%         报告文件绝对路径 （将数据文件的后缀.dat替换为.report.xml）
-         *//*
         String[] item = signalFile.getName().split("_");
         Map<String, Object> map = new HashMap<>();
         map.put("TASKSERIALNUMBER",order.getTaskSerialNumber());
@@ -379,15 +372,14 @@ public class QATaskAction{
         qaTaskWorkFlow.setCreatetime(t.getStartTime());
         qaTaskWorkFlow.setUpdatetime(DateUtil.getTime());
         qaTaskWorkFlowManager.saveQaTask(qaTaskWorkFlow);
-     *//*   workFlowTree tree = new workFlowTree();
+        workFlowTree tree = new workFlowTree();
         tree.setOrderid(orderId);
-        treeManager.saveWorkFlowTree(tree);*//*
+        treeManager.saveWorkFlowTree(tree);
     }
 
 
     public void processQ63(WorkflowOrder t)throws Exception{
         processInfoimpl = new ProcessInfoImpl();
-        catManager = new mCatManager();
         orderManager = new WorkFlowOrderManager();
         //选取若干景。此时jobTaskID肯定只有一个
         String jobTaskID= t.getJobTaskID();
@@ -395,19 +387,19 @@ public class QATaskAction{
         List<Mcat> ls = null;
         switch (t.getDataSelectType()) {
             case "Full":
-                ls = catManager.selectSceneByFull(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""));
+                ls = mcatManagerService.selectSceneByFull(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""));
                 //ls = db.selectSceneByFull(jobTaskID,Sensor.fromOMOSensors(t.satellite.name(),String2ListListXmlAdapter.toList(t.sensorName)));
                 break;
             case "Time":
-                ls = catManager.selectSceneByTime(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""),t.getSensorStartTime(),t.getSensorEndTime());
+                ls = mcatManagerService.selectSceneByTime(jobTaskID, Sensor.fromOMOSensor(t.getSatelliteName(),""),t.getSensorStartTime(),t.getSensorEndTime());
                // ls = db.selectSceneByTime(jobTaskID,Sensor.fromOMOSensors(t.satellite.name(),String2ListListXmlAdapter.toList(t.sensorName)),t.sensorStartTime,t.sensorEndTime);
                 break;
             case "AutoType":  //AutoType
-                ls = catManager.selectSceneByAuto(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""));
+                ls = mcatManagerService.selectSceneByAuto(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""));
                 //ls = db.selectSceneByAuto(jobTaskID, Sensor.fromOMOSensors(t.satellite.name(),String2ListListXmlAdapter.toList(t.sensorName)));
                 break;
             case "custom":
-                ls = catManager.selectByCustom(t.getSceneID().split(";"));
+                ls = mcatManagerService.selectByCustom(t.getSceneID().split(";"));
                 break;
         }
 
@@ -415,7 +407,7 @@ public class QATaskAction{
         if (ls.get(0).getSceneid().equals("")){
             logger.info("景ID错误");
             t.setOrderStatus("4");
-            orderManager.updateOrder(t);
+            orderService.updateById(t);
         }
         sceneCountQ63=ls.size();
         logger.info("select "+sceneCountQ63+" scenes by "+t.dataSelectType);
@@ -458,7 +450,7 @@ public class QATaskAction{
     }
 
     private String generateTaskInfo(WorkflowOrder t) {
-        *//**
+        *
          *taskinfo格式如下（根据需要可增加项目）：
          *<t>
          *  <satellite>GF01</satellite>    #注意是卫星简称
@@ -471,7 +463,7 @@ public class QATaskAction{
          *  <orbit>7960</orbit>                #Q64模式下的轨道号
          *  <QAReportFile>GF01/REPORT/201312/20131212/QAReport_GF01_QA2013000001_20131212235959/QAReport_GF01_QA2013000001_20131212235959.xls</QAReportFile>  #相对路径
          *</t>
-         *//*
+
         StringBuffer sb=new StringBuffer();
         sb.append("<t>");
         sb.append("<satellite>"+t.getSatelliteName()+"</satellite>");
@@ -507,14 +499,14 @@ public class QATaskAction{
     }
 
 
-    *//**
+    *
      *
      * @param orderIdSuffix  年月日的编号
      * @param scene     景id
      * @param time      时间--当前时间
      * @return
      * @throws Exception
-     *//*
+
     protected static Map generateOrderParamsForGF_CAT_TO_L2A(String orderIdSuffix,WorkflowOrder t,String jobTaskId, Mcat scene,Date time) throws Exception{
         Map<String, Object> map = generateCommonOrderParamsForGF_CAT_TO_L2A(orderIdSuffix, t,jobTaskId, scene, time);
 
@@ -528,7 +520,7 @@ public class QATaskAction{
         return file;
     }
 
-    *//**
+    *
      *
      * @param orderIdSuffix
      * @param scene
@@ -536,7 +528,7 @@ public class QATaskAction{
 
      * @return
      * @throws Exception
-     *//*
+
     private static Map generateCommonOrderParamsForGF_CAT_TO_L2A(String orderIdSuffix,WorkflowOrder t, String jobTaskId,Mcat scene,Date time) throws Exception {
         orderManager = new WorkFlowOrderManager();
         String taskId = t.getTaskSerialNumber();
@@ -556,7 +548,7 @@ public class QATaskAction{
 
         File l0Dir = new File(Config.archive_root,"/"+scene.getSatelliteid()+"/"+items[3].substring(0,6)+"/"+items[3]+"/"+jobTaskId);    //条带目录
 
-      *//*  map.put("RAWFILE",l0Dir);*//*
+        map.put("RAWFILE",l0Dir);
         map.put("METAFILE",scene.getFilepath());
         String day= orderIdSuffix.split("_")[0];
         File L1Dir = null;
@@ -768,7 +760,7 @@ public class QATaskAction{
 
 
     private Map generateOrderParamsForGF_Q64_DIFF(WorkflowOrder t,File job1S1,File  job2S1, File job1S2, File job2S2,Date time,String jobtaskId1,String jobtaskId2) throws Exception{
-        *//**
+        *
          *
          *  %YYYYMMDD_XXXXXX%        订单ID后缀
          *  %SATELLITE%                               卫星简称
@@ -791,7 +783,7 @@ public class QATaskAction{
          *                                                                                  JOB199001010000002_S1.report.xml
          *                                                                                 JOB199001010000002_S2.report.xml
          *                                                                                 JOB199001010000001_JOB199001010000002.diff.txt
-         *//*
+
         String s1 = t.getJobTaskID().split(";")[0];
         String s2 = t.getJobTaskID().split(";")[1];
         Map<String, Object> ret = new HashMap<>();
@@ -815,7 +807,7 @@ public class QATaskAction{
     }
 
     private Map generateOrderParamsForGF_Q65(WorkflowOrder t,Date time) throws Exception{
-        *//**
+        *
          *  %YYYYMMDD_XXXXXX%        订单ID后缀
          *  %TASKSERIALNUMBER%    taskSerialNumber
          *  %SATELLITE%           卫星简称
@@ -828,7 +820,7 @@ public class QATaskAction{
          *  %QAREPORT%            生成报表文件的绝对路径
          *
          *   报表文件归档路径规范参看：ResponseType.buildQAReportFileRelativePath()
-         *//*
+
         File reportFile = new File(Config.dataBank_dir, "/"+t.getSatelliteName().replaceAll("-","")+"/REPORT/"+
                 new SimpleDateFormat("yyyyMM").format(time)+"/"+
                 new SimpleDateFormat("yyyyMMdd").format(time)+"/"+t.getTaskSerialNumber()+"/"+t.getTaskSerialNumber()+".xlsx");
@@ -849,7 +841,7 @@ public class QATaskAction{
     }
 
     private Map generateOrderParamsForGF_Q61_62_63_QAReport(WorkflowOrder t,Date time) throws Exception {
-        *//**
+        *
          *  %YYYYMMDD_XXXXXX%        订单ID后缀
          *  %SATELLITE%          卫星简称
          *  %TASKMODE%           作业模式
@@ -862,7 +854,7 @@ public class QATaskAction{
          *  %QAREPORT%           生成报表文件的绝对路径
          *
          *  报表文件归档路径规范参看：ResponseType.buildQAReportFile()
-         *//*
+
         Map<String, Object> ret = new HashMap();
         ret.put("TASKSERIALNUMBER",t.getTaskSerialNumber());
         ret.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
@@ -881,6 +873,6 @@ public class QATaskAction{
         Files.createDirectories(reportFile.getParentFile().toPath());  //必须先尝试创建各级目录
         ret.put("QAREPORT", reportFile.getPath());
         return ret;
-    }*/
+    }
 }
 }
