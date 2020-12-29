@@ -27,21 +27,10 @@ public interface McatManagerDao extends BaseMapper<Mcat> {
      * String jobTaskID,List<String> sensors
      */
     List<Mcat> selectByAuto(Map<String,String> map)throws Exception;
-    /**
-     * 根据景ID
-     */
-    List<Mcat>selectByCustom(String [] sceneID)throws Exception;
-
 
     /**
      * 根据景ID获取
      */
     Mcat selectBysceneId(String secenID);
 
-    int selectStartBySceneId(String secenId)throws Exception;
-
-    int selectEndBySceneId(String secenId)throws Exception;
-
-
-    Mcat selectUrlByJobtaskId(Map<String, String> map)throws Exception;
 }

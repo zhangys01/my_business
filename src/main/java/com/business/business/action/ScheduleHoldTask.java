@@ -5,9 +5,12 @@ import com.business.business.config.Config;
 import com.business.business.entity.WorkflowOrder;
 import com.business.business.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,7 +24,7 @@ import java.util.List;
  */
 @Component
 @Configuration
-@EnableScheduling
+@EnableScheduling   //打开quartz定时器总开关
 public class ScheduleHoldTask {
     @Autowired
     private WorkFlowOrderService orderService;
@@ -30,7 +33,8 @@ public class ScheduleHoldTask {
     @Resource
     QATaskAction qaTaskAction;
     //3.添加定时任务
-    @Scheduled(cron = "0/5 * * * * ?")
+
+    @Scheduled(cron = "0/5 * * * * ? ")   //第0秒钟触发，每5秒中触发一次
     public void configureTasks()throws Exception{
         System.out.println(DateUtil.getTime()+"开始获取等待状态任务");
         List<WorkflowOrder>runList = orderService.selectList("2");
@@ -53,18 +57,17 @@ public class ScheduleHoldTask {
                             orderService.updateById(order);
                             processDATask(order);
                             break;
-                       /* case "PRTask":
+                        case "PRTask":
                             orderService.updateById(order);
                             PRtaskAction pRtaskAction = new PRtaskAction();
                             pRtaskAction.doTriggerQATask(order);
-                            break;*/
+                            break;
                     }
                 }
             }
         }
         }
     public synchronized boolean processDATask(WorkflowOrder t)throws Exception{
-        Config.loadConfig();
         boolean result = false;
         try{
             //todo 三种情况

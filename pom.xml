@@ -72,6 +72,27 @@
             <artifactId>jedis</artifactId>
             <version>3.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>eclipselink</groupId>
+            <artifactId>org.eclipse.persistence.oxm.annotations.XmlPath</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/eclipselink.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>ganymed-ssh2-build210</groupId>
+            <artifactId>ch.ethz.ssh2.</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/ganymed-ssh2-build210.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>org.apache.commons.io.</artifactId>
+            <version>1.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/commons-io-1.4.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

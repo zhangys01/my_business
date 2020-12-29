@@ -1,6 +1,7 @@
 package com.business.business.util;
 
 import com.business.business.Service.ProcessInfoService;
+import com.business.business.Service.impl.ProcessInfoServiceImpl;
 import com.business.business.entity.ProcessInfo;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +29,10 @@ public class ProcessUtil {
     private static final Logger logger = Logger.getLogger(ProcessUtil.class);
     //private static IProcessDriver service;
     @Autowired
-    private ProcessInfoService processInfoService;
+    private static ProcessInfoService processInfoService;
 //todo 修改webservice方式为redis方式
-    public void submitProcess(String orderXml,int waitTimeout) throws Exception{
-        //向工作流引擎提交流程订单，waitTimeout为提交订单后等待记录创建的超时时间(秒)。记录创建成功则返回orderId，否则抛异常。
+    public static String submitProcess(String orderXml,int waitTimeout) throws Exception{
+       //向工作流引擎提交流程订单，waitTimeout为提交订单后等待记录创建的超时时间(秒)。记录创建成功则返回orderId，否则抛异常。
         logger.debug("submitting process-order: " + orderXml);
         String orderId=validateOrder(orderXml);
         Jedis redis = new Jedis("10.5.6.225",8715);

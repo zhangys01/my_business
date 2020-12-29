@@ -14,6 +14,15 @@ import java.util.List;
  */
 @Mapper
 public interface WorkFlowOrderDao extends BaseMapper<WorkflowOrder> {
-    WorkflowOrder findOrderById(@Param("taskSerialNumber") String taskSerialNumber);
     List<WorkflowOrder> selectList(String status);
+    /**
+     * 根据ID获取任务
+     */
+    WorkflowOrder findById(@Param("jobTaskID") String taskId)throws Exception;
+
+    /*查询等待的订单，改为Running*/
+    List<WorkflowOrder> selectRunList(String orderStatus)throws Exception;
+
+    WorkflowOrder findDataskByJobId(@Param("jobTaskID") String jobTaskId)throws Exception;
+
 }

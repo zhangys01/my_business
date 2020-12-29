@@ -18,15 +18,5 @@
 	<select id="selectBysceneId" parameterType="String" resultType="integer">
 		select * from gt_m_cat where sceneid = #{secenId}
 	</select>
-	<select id="selectStartBySceneId" parameterType="String" resultType="integer">
-		select extractvalue(xmltypedata,'/SceneMeta/SceneInfo/StartLine/text()') start
-		from gt_m_cat where sceneid = #{secenID}
-	</select>
-	<select id="selectEndBySceneId" parameterType="String" resultType="integer">
-		select extractvalue(xmltypedata,'/SceneMeta/SceneInfo/EndLine/text()') end
-		from gt_m_cat where sceneid = #{secenID}
-	</select>
-	<select id="selectUrlByJobtaskId" parameterType="Map" resultType="com.business.business.entity.Mcat">
-		select * from t_m_cat where jobtaskid=#{jobTaskId} and sensorid =#{sensorId} limit 1
-	</select>
+
 </mapper>

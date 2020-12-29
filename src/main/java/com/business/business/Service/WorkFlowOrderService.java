@@ -11,6 +11,14 @@ import java.util.List;
  * Created by w_kiven on 2020/12/2 15:39
  */
 public interface WorkFlowOrderService extends IService<WorkflowOrder> {
-    WorkflowOrder findOrderById(String taskSerialNumber);
     List<WorkflowOrder> selectList(String status);
+
+    WorkflowOrder findById(String taskId)throws Exception;
+
+    /*查询等待的订单，改为Running*/
+    List<WorkflowOrder> selectRunList(String orderStatus)throws Exception;
+
+    WorkflowOrder findDataskByJobId(String jobTaskId)throws Exception;
+
+
 }
