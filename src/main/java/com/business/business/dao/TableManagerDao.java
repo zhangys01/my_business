@@ -11,4 +11,7 @@ import com.business.business.entity.TableManager;
 public interface TableManagerDao extends BaseMapper<TableManager> {
     void deleteByJobtaskId(String jobtaskId);
     void deleteByTaskId(String taskId);
+    void deleteProductIdByL1A(String PRODUCTID_L1A);
+    void deleteProductIdByL2A(String PRODUCTID_L2A);
+
 }

@@ -6,10 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName(value = "gt_r_r0")
 public class GtRr0 {
-    @TableId(value = "id",type = IdType.AUTO)
+
     private String id;
     private String segmentid;
     private String signalid;
+    @TableId(value = "jobtaskid")               //主键
     private String jobtaskid;
     private String satelliteid;
     private String sensorid;
@@ -17,6 +18,7 @@ public class GtRr0 {
     private String notecreatetime;
     private String filecreatetime;
     private String xmltypedata;
+    private String channelid;
 
     public String getId() {
         return id;
@@ -96,5 +98,13 @@ public class GtRr0 {
 
     public void setXmltypedata(String xmltypedata) {
         this.xmltypedata = xmltypedata;
+    }
+
+    public String getchannelid() {
+        return channelid;
+    }
+
+    public void setchannelid(String channelid) {
+        this.channelid = channelid;
     }
 }

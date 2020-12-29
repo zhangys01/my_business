@@ -37,12 +37,6 @@ import java.util.Map;
      */
      Mcat selectBysceneId(String secenID)throws Exception;
 
-     int selectStartBySceneId(String secenId)throws Exception;
-
-     int selectEndBySceneId(String secenId)throws Exception;
-
-     Mcat selectUrlByJobtaskId(Map<String, String> map)throws Exception;
-
     List<Mcat> selectSceneByFull(String jobTaskId, List<String> sensors) throws Exception;
 
     List<Mcat> selectSceneByTime(String jobTaskID, List<String> sensors, String startTime, String endTime);

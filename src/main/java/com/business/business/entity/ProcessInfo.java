@@ -1,6 +1,6 @@
 package com.business.business.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -11,28 +11,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
  */
 @TableName(value = "pd_processinfo")
 public class ProcessInfo {
-
-    @TableId(value = "orderId")
+    @TableId(value = "processId",type = IdType.AUTO)
+    private String processId ;
     private String orderId;
-    @TableField(value = "processId")
-    private String processId;
-    @TableField(value = "processType")
     private String processType;
-    @TableField(value = "processName")
     private String processName;
-    @TableField(value = "status")
     private String status;
-    @TableField(value = "creator")
     private String creator;
-    @TableField(value = "platform")
     private String platform;
-    @TableField(value = "sensor")
     private String sensor;
-    @TableField(value = "priority")
     private int priority;
-    @TableField(value = "createTime")
     private String createTime;
-    @TableField(value = "endTime")
     private String endTime;
 
     public String getProcessId() {

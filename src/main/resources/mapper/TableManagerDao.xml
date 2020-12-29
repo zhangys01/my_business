@@ -9,4 +9,10 @@
 	<delete id="deleteByTaskId" parameterType="String" >
 
 	</delete>
+	<delete id="deleteProductIdByL1A" parameterType="String" >
+		delete from gt_m_l1,gt_r_l1 where PRODUCTID_L1A=#{PRODUCTID_L1A}
+	</delete>
+	<delete id="deleteProductIdByL2A" parameterType="String" >
+		delete from gt_m_l2,gt_r_21 where PRODUCTID_L2A=#{PRODUCTID_L2A}
+	</delete>
 </mapper>

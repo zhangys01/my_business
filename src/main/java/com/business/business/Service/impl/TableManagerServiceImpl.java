@@ -22,4 +22,14 @@ public class TableManagerServiceImpl extends ServiceImpl<TableManagerDao, TableM
     public void deleteByTaskId(String taskId) {
         baseMapper.deleteByTaskId(taskId);
     }
+
+    @Override
+    public  void  deleteProductIdByL1A(String PRODUCTID_L1A){
+        baseMapper.deleteProductIdByL1A(PRODUCTID_L1A);
+    }
+
+    @Override
+    public void deleteProductIdByL2A(String PRODUCTID_L2A){
+        baseMapper.deleteProductIdByL2A(PRODUCTID_L2A);
+    }
 }

@@ -13,7 +13,8 @@ public enum  Satellite {  //枚举名：卫星简称
     GF1C("GF-1C"),
     GF1D("GF-1D"),
     ZY3B("ZY-3B"),
-    ZY302("ZY302");
+    ZY302("ZY302"),
+    CASEARTH("CASEARTH");
 
 
     private String fullName;  //卫星名称(全称)

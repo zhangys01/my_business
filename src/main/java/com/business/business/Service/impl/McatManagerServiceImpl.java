@@ -56,20 +56,6 @@ public class McatManagerServiceImpl extends ServiceImpl<McatManagerDao, Mcat> im
         return baseMapper.selectBysceneId(secenID);
     }
 
-    @Override
-    public int selectStartBySceneId(String secenId) throws Exception {
-        return baseMapper.selectStartBySceneId(secenId);
-    }
-
-    @Override
-    public int selectEndBySceneId(String secenId) throws Exception {
-        return baseMapper.selectEndBySceneId(secenId);
-    }
-
-    @Override
-    public Mcat selectUrlByJobtaskId(Map<String, String> map) throws Exception {
-        return baseMapper.selectUrlByJobtaskId(map);
-    }
     public  List<Mcat> selectSceneByFull(String jobTaskId, List<String> sensors) throws Exception {
         List<Mcat> catInfoList = new ArrayList<>();
         Map<String,String>map = new HashMap<>();
@@ -114,7 +100,6 @@ public class McatManagerServiceImpl extends ServiceImpl<McatManagerDao, Mcat> im
         List<Mcat>ret = new ArrayList<>();
         Map<String ,String>map = new HashMap<>();
         try {
-            Config.loadConfig();
             map.put("taskid",jobTaskID);
             for (String sensor1:sensors){
                 List<Mcat>ls = new ArrayList<>();

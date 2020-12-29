@@ -1,6 +1,8 @@
 package com.business.business.enums;
 
 
+import com.business.business.adapter.String2ListXmlAdapter;
+
 /**
  * Created with IntelliJ IDEA.
  * User: dbs01
@@ -15,5 +17,8 @@ public enum TaskMode {
     Q64,
     Q65;
 
-
+    public static String toAutoTaskModes(){
+        //返回常规流程下的Q61、62、63组合模式串。半角分号分隔
+        return Q61+String2ListXmlAdapter.DELIMIT+Q62+String2ListXmlAdapter.DELIMIT+Q63;
+    }
 }
