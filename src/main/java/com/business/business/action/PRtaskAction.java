@@ -41,11 +41,14 @@ public class PRtaskAction {
     private TableManagerService tableManagerService;
     @Autowired
     private QATaskWorkFlowService qaTaskWorkFlowManagerService;
+    @Autowired
+    private QATaskAction qaTaskAction;
     public void doTriggerQATask( WorkflowOrder t) throws Exception {
         switch (t.getSatelliteName()){
             case "GF-1B":
             case"GF-1C":
             case"GF-1D":
+            case "CESEARTH":
                 GFProductL2A(t);
                 break;
             case"ZY-3B":
@@ -69,10 +72,10 @@ public class PRtaskAction {
             String orderXml = "";
             if (t.getSceneID().split("_")[1].equals("PA")){
                 //构建流程订单
-                orderXml = ProcessType.GF1_CAT_TO_L1A.generateOrderXml(generateOrderParamsForGF_L1A_TO_L2A(t,jobTaskID,mcat,time));
+                orderXml = ProcessType.GF1_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,mcat));
             }else{
                 //构建流程订单
-                orderXml = ProcessType.GF1_CAT_TO_L1A.generateOrderXml(generateOrderParamsForGF_L1A_TO_L2A(t,jobTaskID,mcat,time));
+                orderXml = ProcessType.GF1_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,mcat));
             }
             logger.debug("generate process order: \n" + orderXml);
             //提交流程
@@ -83,10 +86,10 @@ public class PRtaskAction {
             String orderXml = "";
             if (t.getSceneID().split("_")[1].equals("PA")){
                 //构建流程订单
-                orderXml = ProcessType.GF1_CAT_TO_L2A.generateOrderXml(generateOrderParamsForGF_L1A_TO_L2A(t,jobTaskID,mcat,time));
+                orderXml = ProcessType.GF1_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,mcat));
             }else {
                 //构建流程订单
-                orderXml = ProcessType.GF1_CAT_TO_L2A.generateOrderXml(generateOrderParamsForGF_L1A_TO_L2A(t,jobTaskID,mcat,time));
+                orderXml = ProcessType.GF1_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,mcat));
             }
             logger.debug("generate process order: \n" + orderXml);
             //提交流程
@@ -127,14 +130,14 @@ public class PRtaskAction {
         String sensorName = t.getSceneID().split("_")[1];
         //todo 根据是生产L1A还是都生产构建订单
         if (t.getProductLevel().equals("L1")){
-            String orderXml = ProcessType.ZY3B_CAT_TO_L1A.generateOrderXml(generateOrderParamsForGF_L1A_TO_L2A(t,jobTaskID,s,time));
+            String orderXml = ProcessType.ZY3B_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,s));
             logger.debug("generate process order: \n" + orderXml);
             //提交流程
             String orderId = ProcessUtil.submitProcess(orderXml,Config.submit_order_timeout);
             subOrderIds.add(orderId);
             subInfos.add(s.getSceneid());
         }else {
-            String orderXml = ProcessType.ZY3B_CAT_TO_L2A.generateOrderXml(generateOrderParamsForGF_L1A_TO_L2A(t,jobTaskID,s,time));
+            String orderXml = ProcessType.ZY3B_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,s));
             logger.debug("generate process order: \n" + orderXml);
             //提交流程
             String orderId = ProcessUtil.submitProcess(orderXml,Config.submit_order_timeout);
@@ -185,11 +188,4 @@ public class PRtaskAction {
         return sb.toString();
     }
 
-    private Map generateOrderParamsForGF_L1A_TO_L2A(WorkflowOrder t, String jobTaskID, Mcat scene, Date time) throws Exception {
-        //taskId为作业任务编号；生产次数需具体统计
-        //catManager = new mCatManager();
-        return QATaskAction.generateOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,jobTaskID,scene,time);
-        //startLine catManager.getL1AnextCount(scene.getSceneid())
-        //endLine   catManager.getL2AnextCount(scene.getSceneid())
-    }
 }
