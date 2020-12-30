@@ -27,7 +27,6 @@ import java.util.List;
 @Component
 public class ProcessUtil {
     private static final Logger logger = Logger.getLogger(ProcessUtil.class);
-    //private static IProcessDriver service;
     @Autowired
     private static ProcessInfoService processInfoService;
 //todo 修改webservice方式为redis方式

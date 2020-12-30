@@ -41,13 +41,6 @@ public class String2ListListXmlAdapter extends XmlAdapter<String, List<List<Stri
         return ret;
     }
 
-    public static List<String> toList(List<List<String>> list) {
-        List<String> ret = new ArrayList<>();
-        for (List<String> ls : list)
-            for (String s : ls)
-                ret.add(s);
-        return ret;
-    }
 
     public static String toString(List<List<String>> list) {
         if (list == null) return null;
@@ -72,7 +65,6 @@ public class String2ListListXmlAdapter extends XmlAdapter<String, List<List<Stri
 
     @Override
     public String marshal(List<List<String>> list) throws Exception {
-        //throw new UnsupportedOperationException("unsupported marshal operation!");
         return toString(list);
     }
 }

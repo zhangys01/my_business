@@ -45,8 +45,6 @@ public class QATaskAction{
     ProcessUtil processUtil;
     @Autowired
     private WorkFlowOrderService orderService;
-    //@Autowired
-    //private  static WorkFlowOrderService orderService2;         //在generateProductL2ForZY中517处调用，讲台方法的掉用
     @Autowired
     private McatManagerService mcatManagerService;
     @Autowired
@@ -61,29 +59,17 @@ public class QATaskAction{
                 //先生成报告文件路径
                 QAReportFile = ResponseType.buildQAReportFileRelativePath(order.getJobTaskID(),order.getSatelliteName().replace("-",""),order.getTaskSerialNumber());
                 if (order.taskMode.contains("Q63")){
-                    switch (order.getSatelliteName()){
-                        case "GF-1B":
-                        case "GF-1C":
-                        case "GF-1D":
-                        case "CASEARTH":
-                            processQ63(order);
-                            break;
-                        case "ZY-3B":
-                            processQ63(order);
-                            break;
-                    }
+                    processQ63(order);
                 }
                 if(order.taskMode.contains(TaskMode.Q64.name())) {  //特殊处理，需先触发差异性分析流程
                     processQ64(order);
                 }
-                    Date time=new Date();  //任务创建时间
                     ProcessType processType;
-
                     Map orderParams;
                     if (order.taskMode.contains("Q65")) {  //直接触发Q65评价流程
                         //todo q65直接触发流程
                         processType = ProcessType.KJ125_Q65;
-                        orderParams = generateOrderParamsForGF_Q65(order,time);
+                        orderParams = generateOrderParamsForGF_Q65(order);
                         //构建流程订单
                         String orderXml = processType.generateOrderXml(orderParams);
                         processUtil.submitProcess(orderXml, Config.submit_order_timeout);
@@ -102,8 +88,6 @@ public class QATaskAction{
                                 List<GtRr0> gtrR0List = gtRr0ManagerService.listByJobId(order.getJobTaskID());
                                 if (gtrR0List.size()==0){
                                     //todo S1Fili和S2File 查询集中存储？
-                                    List<String> subOrderIds = new ArrayList<>();
-                                    List<String> subInfos = new ArrayList<>();
                                     String S1ReportOrderXml=null,S2ReportOrderXml=null;
                                     String satellite = order.getSatelliteName().replace("-","");
                                 List<String>datList = new ArrayList<>();
@@ -134,8 +118,6 @@ public class QATaskAction{
                                             processUtil.submitProcess(S2ReportOrderXml,Config.submit_order_timeout);
                                         }
                                     }
-
-                                   // treeManager.saveTreeSubWorkFlow(order.getTaskSerialNumber(),DateUtil.getTime(),subOrderIds,subInfos);
                                 }
                                     break;
                                 }
@@ -145,7 +127,7 @@ public class QATaskAction{
                         if (taskMode.equals("Q61;Q62;Q63")){
                         }else if (taskMode.equals("Q62")){
                             processType = ProcessType.KJ125_Q61_62_63_QAReport;
-                            orderParams = generateOrderParamsForGF_Q61_62_63_QAReport(order,time);
+                            orderParams = generateOrderParamsForGF_Q61_62_63_QAReport(order);
                             //构建流程订单
                             String orderXml = processType.generateOrderXml(orderParams);
                             processUtil.submitProcess(orderXml,Config.submit_order_timeout);
@@ -172,22 +154,17 @@ public class QATaskAction{
         map.put("PINFILE", Config.diff_pinfile_05);
         //todo 更换路径
         File dir = new File(Config.dataBank_dir+"/"+satellite+"/SIGNAL/"+item[3].substring(0,6)+"/"+item[3]);
-        if (!dir.exists()||!dir.isDirectory()){
-            Files.createDirectories(dir.toPath());
-        }
+        MyHelper.CreateDirectory(dir);
         map.put("REPORT",dir+"/"+signalFile.getName().replace(".dat", ".report.xml"));
-      //  map.put("REPORT", signalFile.getPath().replace(".dat", ".report.xml"));
         return map;
     }
 
     public synchronized List<String> processQATask(WorkflowOrder t)throws Exception{
         //先删除R0表
         if (t.getSatelliteName().equals("ZY-3B"))t.setSatelliteName("ZY302");
-        //processInfoimpl = new ProcessInfoImpl();
         gtRr0ManagerService.removeById(t.getJobTaskID());
         List<String>datList = new ArrayList<>();
         boolean result = false;
-        //orderManager = new WorkFlowOrderManager();
         //按原始的列举法，WatchService只是用于快速响应
         //todo,现在监控目录变了，/raw/zone_H是data_dir,
         File datadir = new File(Config.data_dir+"/"+t.getSatelliteName()+"/"+t.getJobTaskID().substring(3,7));
@@ -202,7 +179,6 @@ public class QATaskAction{
             if (t.getJobTaskID().equals(jobTaskID)){
                 File ok = new File(sub, jobTaskID + ".OK");
                 if (!ok.isFile()) continue;   //无OK文件
-                //   if(!Config.isMonitorTarget(sub)) continue ; //不是自己的监控目标数据，则忽略之
                 logger.info("found OK file: " + ok);
                 File desc = new File(sub, jobTaskID + ".DESC");
                 try {
@@ -249,9 +225,6 @@ public class QATaskAction{
     }
 
     public void processQ64(WorkflowOrder t)throws Exception{
-//        r0InfoManager = new R0InfoManager();
-//        treeManager = new WorkFlowTreeManager();
-//        qaTaskWorkFlowManager = new QATaskWorkFlowManager();
         //差异性分析必须包含两个作业任务编号。查询两个jobTaskID各自对应的原始码流文件（不必检查文件是否存在）
         File job1S1=null,job1S2=null,job2S1=null,job2S2=null;
         String jobtaskId1 = null,jobtaskId2 = null;
@@ -313,7 +286,6 @@ public class QATaskAction{
 
         //触发差异性分析流程。注意，不要使用虚拟主流程，必须直接用差异性分析流程作为主流程，
         //后续的原始码流质量分析子流程及生成报表子流程都直接以它作为父流程！
-        //在TaskCheckThread.checkOMOQATask()方法判断是否已触发了生成报表子流程时，需依赖此父子关系！
         Date time=new Date();  //统一用一个任务创建时间
         Map map=generateOrderParamsForGF_Q64_DIFF(t,job1S1, job2S1, job1S2, job2S2,time,jobtaskId1,jobtaskId2);
         String orderXml = ProcessType.KJ125_Q64_DIFF.generateOrderXml(map);
@@ -326,20 +298,16 @@ public class QATaskAction{
     public void processQ63(WorkflowOrder t)throws Exception{
         //选取若干景。此时jobTaskID肯定只有一个
         String jobTaskID= t.getJobTaskID();
-//        List<CatInfo> ls = null;
         List<Mcat> ls = null;
         switch (t.getDataSelectType()) {
             case "Full":
                 ls = mcatManagerService.selectSceneByFull(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""));
-                //ls = db.selectSceneByFull(jobTaskID,Sensor.fromOMOSensors(t.satellite.name(),String2ListListXmlAdapter.toList(t.sensorName)));
                 break;
             case "Time":
                 ls = mcatManagerService.selectSceneByTime(jobTaskID, Sensor.fromOMOSensor(t.getSatelliteName(),""),t.getSensorStartTime(),t.getSensorEndTime());
-               // ls = db.selectSceneByTime(jobTaskID,Sensor.fromOMOSensors(t.satellite.name(),String2ListListXmlAdapter.toList(t.sensorName)),t.sensorStartTime,t.sensorEndTime);
                 break;
             case "AutoType":  //AutoType
                 ls = mcatManagerService.selectSceneByAuto(jobTaskID,Sensor.fromOMOSensor(t.getSatelliteName(),""));
-                //ls = db.selectSceneByAuto(jobTaskID, Sensor.fromOMOSensors(t.satellite.name(),String2ListListXmlAdapter.toList(t.sensorName)));
                 break;
             case "custom":
                 ls = mcatManagerService.selectByCustom(t.getSceneID().split(";"));
@@ -356,8 +324,6 @@ public class QATaskAction{
         logger.info("select "+sceneCountQ63+" scenes by "+t.dataSelectType);
         Date time=new Date();  //统一用一个任务创建时间
         //处理每一景
-        List<String> subOrderIds = new ArrayList<>();
-        List<String> subInfos = new ArrayList<>();  //景ID列表
         String orderXml = null;
         for (Mcat s : ls) {
             //构建流程订单
@@ -368,6 +334,8 @@ public class QATaskAction{
             //todo 暂时这么写，03/28
             if (s.getSatelliteid().contains("GF1")){
                 orderXml = ProcessType.GF1_Q63_CAT_TO_L2A.generateOrderXml(map);
+            }else if (s.getSatelliteid().contains("CASEARTH")){
+                orderXml = ProcessType.CASEARTH_Q63_CAT_TO_L2A.generateOrderXml(map);
             }else if (s.getSatelliteid().contains("ZY3")){
                 orderXml = ProcessType.ZY3B_Q63_CAT_TO_L2A.generateOrderXml(map);
             }
@@ -377,33 +345,6 @@ public class QATaskAction{
         }
     }
 
-    private String generateTaskInfo(WorkflowOrder t) {
-        StringBuffer sb=new StringBuffer();
-        sb.append("<t>");
-        sb.append("<satellite>"+t.getSatelliteName()+"</satellite>");
-        sb.append("<taskMode>"+ t.getTaskMode()+"</taskMode>");
-
-        if(t.getJobTaskID()!=null&&!"".equals(t.getJobTaskID()))
-            sb.append("<jobTaskID>"+t.getJobTaskID()+"</jobTaskID>");
-
-        if(t.getChannelID()!=null&&!"".equals(t.getChannelID()))
-            sb.append("<channel>"+t.getChannelID()+"</channel>");
-
-        sb.append("<sensor>"+ t.getSensorName()+"</sensor>");
-
-        if(t.getDataSelectType()!=null&&!"".equals(t.getDataSelectType()))
-            sb.append("<dataSelectType>"+t.getDataSelectType()+"</dataSelectType>");
-
-        if(sceneCountQ63!=null)
-            sb.append("<sceneCountQ63>"+sceneCountQ63+"</sceneCountQ63>");
-
-        if(t.getOrbitNumber()!=null&&!"".equals(t.getOrbitNumber()))
-            sb.append("<orbit>"+t.getOrbitNumber()+"</orbit>");
-        QAReportFile = ResponseType.buildQAReportFileRelativePath(t.getJobTaskID(),t.getSatelliteName().replace("-",""),t.getTaskSerialNumber());
-        sb.append("<QAReportFile>"+QAReportFile+"</QAReportFile>");
-        sb.append("</t>");
-        return sb.toString();
-    }
     //获取路径
     public String getFileName(String []names,String sensor,File l0Dir)throws Exception{
         String name = names[0]+"_"+sensor+"_"+names[2]+"_"+names[3]+"_"+names[4]+"_R0";
@@ -412,7 +353,6 @@ public class QATaskAction{
     }
 
     public Map generateCommonOrderParamsForGF_CAT_TO_L2A(String orderIdSuffix,WorkflowOrder t, Mcat scene) throws Exception {
-        //orderService = new WorkFlowOrderServiceImpl();
         String taskId = t.getTaskSerialNumber();
         Map<String, Object> map = new HashMap();
         String names[] = scene.getSceneid().split("_");
@@ -440,18 +380,16 @@ public class QATaskAction{
         if (t.getProductLevel().equals("L1")){
             if (t.getOut_productdir().equals("")){
                 L1Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId);
-                Files.createDirectories(L1Dir.toPath());  //必须先尝试创建各级目录
+                MyHelper.CreateDirectory(L1Dir);
             }else{
-                //L1Dir = new File(t.getOut_productdir());
                 L1Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId);
-                Files.createDirectories(L1Dir.toPath());
+                MyHelper.CreateDirectory(L1Dir);
                 outDir = t.getOut_productdir()+";"+Config.dataBank_dir+"/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId;
 
             }
         }else if (t.getProductLevel().equals("L2")){
             L1Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId);
-            Files.createDirectories(L1Dir.toPath());  //必须先尝试创建各级目录
-           // outDir = Config.archive_root+"/DataBank/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId+";";
+            MyHelper.CreateDirectory(L1Dir);
         }
         map.put("DIR_L1A", L1Dir);
         map.put("WORK_DIRL1A", Config.work_dir+"/"+L1ProductId);
@@ -472,13 +410,12 @@ public class QATaskAction{
             File L2Dir = null;
            //todo 判断输出路径是否为空，为空则默认路径 推翻之前的，重新一版
             if (t.getOut_productdir()!=null&&!t.getOut_productdir().equals("")){
-               //L2Dir = new File(t.getOut_productdir());
                 L2Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId);
-                Files.createDirectories(L2Dir.toPath());
+                MyHelper.CreateDirectory(L2Dir);
                 outDir = t.getOut_productdir()+";"+Config.dataBank_dir+"/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId;
             }else{
                 L2Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId);
-                Files.createDirectories(L2Dir.toPath());  //必须先尝试创建各级目录
+                MyHelper.CreateDirectory(L2Dir);
             }
             map.put("DIR_L2A", L2Dir);
             map.put("WORK_DIRL2A",Config.work_dir+"/"+L2ProductId);//工作目录。
@@ -498,8 +435,9 @@ public class QATaskAction{
         orderService.updateById(t);
         return map;
     }
+
     //二级几何校正
-    private static Map generateProductL2ForZY( Map<String,Object>map,Mcat scene,File L2Dir,String L2ProductId)throws Exception{
+    private static Map generateProductL2ForZY(Map<String,Object>map,Mcat scene,File L2Dir,String L2ProductId)throws Exception{
         if("TLC".equals(scene.getSensorid())){
             String []contentStr = scene.getContent().split(",");
             //todo 单个传感器 处理
@@ -618,6 +556,20 @@ public class QATaskAction{
         }
         return map;
     }
+
+//    private static Map putinfoL1(Map<String,Object>map,Mcat scene,File L1Dir,String L1ProductId,String sensorname){
+//        map.put("IMAGEFILE_L1A",new File(L1Dir, L1ProductId + sensorname+".tiff"));
+//        map.put("L1REPORT", new File(L1Dir, L1ProductId + sensorname+".report.xml"));
+//        map.put("L1META", new File(L1Dir, L1ProductId + sensorname+".meta.xml"));
+//        return map;
+//    }
+//    private static Map putinfoL2(Map<String,Object>map,Mcat scene,File L2Dir,String L2ProductId,String sensorname){
+//        map.put("IMAGEFILE_L2A",new File(L2Dir, L2ProductId + sensorname+".tiff"));
+//        map.put("L2REPORT", new File(L2Dir, L2ProductId + sensorname+".report.xml"));
+//        map.put("L2META", new File(L2Dir, L2ProductId + sensorname+".meta.xml"));
+//        return map;
+//    }
+//
     private  Map generateProductForGF( Map<String,Object>map,String []names, Mcat scene,File l0Dir,File L1Dir,String L1ProductId)throws Exception{
         if ("PAN1".equals(scene.getSensorid())){
             String pan1File = getFileName(names,"PAN1",l0Dir);
@@ -643,8 +595,6 @@ public class QATaskAction{
 
     private Map generateOrderParamsForGF_Q64_DIFF(WorkflowOrder t,File job1S1,File  job2S1, File job1S2, File job2S2,Date time,String jobtaskId1,String jobtaskId2) throws Exception{
 
-        String s1 = t.getJobTaskID().split(";")[0];
-        String s2 = t.getJobTaskID().split(";")[1];
         Map<String, Object> ret = new HashMap<>();
         ret.put("YYYYMMDD_XXXXXX",DateUtil.getSdfDate());
         ret.put("SATELLITE", t.getSatelliteName());
@@ -658,19 +608,20 @@ public class QATaskAction{
         File diff = new File(Config.dataBank_dir,  "/"+t.getSatelliteName().replaceAll("-","")+"/REPORT/"+
                 new SimpleDateFormat("yyyyMM").format(time)+"/"+
                 new SimpleDateFormat("yyyyMMdd").format(time)+"/"+t.getTaskSerialNumber()+"/"+jobtaskId1+"_"+jobtaskId2+".diff.txt");
-        Files.createDirectories(diff.getParentFile().toPath());  //必须先尝试创建各级目录
+        MyHelper.CreateDirectory(diff.getParentFile());
+
         //todo 每次做之前做一个清空操作
         MyHelper.emptyDir(new File(diff.getParent()));
         ret.put("DIFFTXT", diff.getPath());
         return ret;
     }
 
-    private Map generateOrderParamsForGF_Q65(WorkflowOrder t,Date time) throws Exception{
+    private Map generateOrderParamsForGF_Q65(WorkflowOrder t) throws Exception{
 
         File reportFile = new File(Config.dataBank_dir, "/"+t.getSatelliteName().replaceAll("-","")+"/REPORT/"+
-                new SimpleDateFormat("yyyyMM").format(time)+"/"+
-                new SimpleDateFormat("yyyyMMdd").format(time)+"/"+t.getTaskSerialNumber()+"/"+t.getTaskSerialNumber()+".xlsx");
-        Files.createDirectories(reportFile.getParentFile().toPath());  //必须先尝试创建各级目录
+                new SimpleDateFormat("yyyyMM").format(DateUtil.getSdfDate())+"/"+
+                new SimpleDateFormat("yyyyMMdd").format(DateUtil.getSdfDate())+"/"+t.getTaskSerialNumber()+"/"+t.getTaskSerialNumber()+".xlsx");
+        MyHelper.CreateDirectory(reportFile.getParentFile());
 
         Map<String, Object> ret = new HashMap();
         ret.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
@@ -686,7 +637,7 @@ public class QATaskAction{
         return ret;
     }
 
-    private Map generateOrderParamsForGF_Q61_62_63_QAReport(WorkflowOrder t,Date time) throws Exception {
+    private Map generateOrderParamsForGF_Q61_62_63_QAReport(WorkflowOrder t) throws Exception {
         Map<String, Object> ret = new HashMap();
         ret.put("TASKSERIALNUMBER",t.getTaskSerialNumber());
         ret.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
@@ -702,7 +653,7 @@ public class QATaskAction{
             ret.put("DATASELECTTYPE", "AutoType");
         File reportFile = new File(Config.dataBank_dir+"/", QAReportFile);
         logger.info(reportFile.getParentFile().toPath());
-        Files.createDirectories(reportFile.getParentFile().toPath());  //必须先尝试创建各级目录
+        MyHelper.CreateDirectory(reportFile.getParentFile());
         ret.put("QAREPORT", reportFile.getPath());
         return ret;
     }

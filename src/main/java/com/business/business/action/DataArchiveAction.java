@@ -3,7 +3,6 @@ package com.business.business.action;
 import com.business.business.Service.TableManagerService;
 import com.business.business.Service.UnzipConfigService;
 import com.business.business.Service.UnzipConfirmService;
-import com.business.business.Service.WorkFlowOrderService;
 import com.business.business.config.Config;
 import com.business.business.entity.UnzipConfig;
 import com.business.business.entity.UnzipConfirm;
@@ -12,6 +11,7 @@ import com.business.business.enums.Channel;
 import com.business.business.enums.ProcessType;
 import com.business.business.enums.Satellite;
 import com.business.business.util.DateUtil;
+import com.business.business.util.MyHelper;
 import com.business.business.util.ProcessUtil;
 import com.business.business.workflow.R0Meta;
 import com.business.business.workflow.UnzipParaTemplate;
@@ -40,7 +40,8 @@ public class DataArchiveAction {
     @Autowired
     private UnzipConfigService unzipConfigService;
     @Resource
-    ProcessUtil processUtil;
+    private ProcessUtil processUtil;
+
     public void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
         File[] datFiles = dataTmpDir.listFiles(new FileFilter() {
             @Override
@@ -52,9 +53,6 @@ public class DataArchiveAction {
             throw new Exception("incorrect dat file count: " + datFiles.length);
 
         String jobTaskId = dataTmpDir.getName();
-        //todo 暂时注释，不知道有啥用
-        //deleteTaskIdByCustom(jobTaskId);    // 删除 TaskId 相关记录，记录来源于手动订单
-        //todo
         logger.info("清理历史数据"+t.getJobTaskID());
         tableManagerService.deleteByJobtaskId(t.getJobTaskID());
 
@@ -84,6 +82,9 @@ public class DataArchiveAction {
             case"GF-1D":
                 unzipOrderXml = ProcessType.GF1_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File,time));
                 break;
+            case"CASEARTH":
+                unzipOrderXml = ProcessType.CASEARTH_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File,time));
+                break;
             case"ZY-3B":
                 unzipOrderXml = ProcessType.ZY3_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File,time));
                 break;
@@ -103,21 +104,20 @@ public class DataArchiveAction {
             signalId = S2File.getName().replace(".dat","");
         }
         String[] items = signalId.split("_");
-        String orderidSuffix= DateUtil.getSdfDate();
         // 参数文件所存放位置
-        String partPath = orderidSuffix.substring(0, 6) + "/" + orderidSuffix.substring(0, 8) + "/" + signalId + "_" + orderidSuffix.split("_")[1] + "/";
+        String partPath = DateUtil.getSdfDate().substring(0, 6) + "/" + DateUtil.getSdfDate().substring(0, 8) + "/" + signalId + "_" + DateUtil.getSdfDate().split("_")[1] + "/";
         logger.info("partPath:-----"+partPath);
         File outputDir=new File(Config.archive_root, satellite.name()+"/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId);
         logger.info("outputDir is :-------"+outputDir.toPath());
         if (!outputDir.exists()&&!outputDir.isDirectory()){
-            Files.createDirectories(outputDir.toPath());  //必须先尝试创建各级目录
+            MyHelper.CreateDirectory(outputDir);
         }
         UnzipConfirm unzipConfirm = new UnzipConfirm();
         //再生成工作流订单参数
         Map<String,Object> map=new HashMap<>();
 
         //todo  生成通道1的解压缩xml
-        unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,orderidSuffix,signalId,partPath);
+        unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,DateUtil.getSdfDate(),signalId,partPath);
         unzipConfirm.setStatus(0);
         unzipConfirm.setTaskId(t.getTaskSerialNumber());
         unzipConfirmService.save(unzipConfirm);
@@ -142,47 +142,39 @@ public class DataArchiveAction {
             case"GF-1B":
             case"GF-1C":
             case"GF-1D":
+            case "CASEARTH":
                 //todo 解压缩改好之后，这四个加上 Config.unzip_dir+
-                l0DataDir1 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/PAN1");
-                l0DataDir2 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/MSS1");
-                l0DataDir3 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/PAN2");
-                l0DataDir4 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/MSS2");
+                l0DataDir1 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/PAN1"));
+                l0DataDir2 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/MSS1"));
+                l0DataDir3 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/PAN2"));
+                l0DataDir4 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/MSS2"));
                 //todo Config.archive_root 替换"/KJ125ZL/DataBank/"
-                dir1 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/PAN1");
-                dir2 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/MSS1");
-                dir3 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/PAN2");
-                dir4 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/MSS2");
+                dir1 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/PAN1"));
+                dir2 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/MSS1"));
+                dir3 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/PAN2"));
+                dir4 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/MSS2"));
                 break;
             case"ZY-3B":
                 //todo 解压缩改好之后，这四个加上 Config.unzip_dir+
-                l0DataDir1 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/NAD");
-                l0DataDir2 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/MUX");
-                l0DataDir3 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/FWD");
-                l0DataDir4 = new File(Config.archive_unzip+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/BWD");
-                dir1 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/NAD");
-                dir2 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/MUX");
-                dir3 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/FWD");
-                dir4 = new File(Config.archive_root+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/BWD");
+                l0DataDir1 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/NAD"));
+                l0DataDir2 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/MUX"));
+                l0DataDir3 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/FWD"));
+                l0DataDir4 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/BWD"));
+                dir1 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/NAD"));
+                dir2 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/MUX"));
+                dir3 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/FWD"));
+                dir4 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/BWD"));
                 break;
         }
         //todo 解压缩改好后，这个加上Config.unzip_dir+
-        srv = new File(Config.archive_unzip+"/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/srv");
-        srvFile = new File(Config.archive_root+"/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/srv");
-        if (!srvFile.exists()||!srvFile.isDirectory()){
-            Files.createDirectories(srvFile.toPath());  //必须先尝试创建各级目录
-        }
-        if (!dir1.exists()||!dir1.isDirectory()){
-            Files.createDirectories(dir1.toPath());  //必须先尝试创建各级目录
-        }
-        if (!dir2.exists()||!dir2.isDirectory()){
-            Files.createDirectories(dir2.toPath());  //必须先尝试创建各级目录
-        }
-        if (!dir3.exists()||!dir3.isDirectory()){
-            Files.createDirectories(dir3.toPath());  //必须先尝试创建各级目录
-        }
-        if (!dir4.exists()||!dir4.isDirectory()){
-            Files.createDirectories(dir4.toPath());  //必须先尝试创建各级目录
-        }
+        srv = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/srv"));
+        srvFile = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/srv"));
+        MyHelper.CreateDirectory(srvFile);
+        MyHelper.CreateDirectory(dir1);
+        MyHelper.CreateDirectory(dir2);
+        MyHelper.CreateDirectory(dir3);
+        MyHelper.CreateDirectory(dir4);
+
         Map<String, Object> map = new HashMap<>();
         map.put("CRATETIME",DateUtil.getTime());
         map.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
@@ -218,29 +210,7 @@ public class DataArchiveAction {
                 map.put("SENSORLIST",sensor1);
             }
             map.put("CHANNEL1",chanel1);
-            //todo 暂时定义四个挂载盘的路径，
-            String filePath = "";
-            switch (dat1.toString().split("/")[1]){
-                case "KJ125ZL":
-                    filePath = dat1.toString().replace("/KJ125ZL","Z:");
-                    break;
-                case "KJ125ZL_2":
-                    filePath = dat1.toString().replace("/KJ125ZL_2","Y:");
-                    break;
-                case "/pools/POOL/TMP":
-                    filePath = dat1.toString().replace("/pools/POOL/TMP","Z:");
-                    break;
-                case "/pools/POOL/WORk":
-                    filePath = dat1.toString().replace("/pools/POOL/WORk","Y:");
-                    break;
-                case "raw":
-                    filePath = "S:"+dat1;
-                    break;
-                case "ncsfs":
-                    filePath = dat1.toString().replace("/ncsfs","T:");
-                    break;
-            }
-            map.put("SYNCPARAFILE1",filePath);
+            map.put("SYNCPARAFILE1",MyHelper.FilePath(dat1));            //todo 暂时定义四个挂载盘的路径，
             map.put("SKIPHEAD1",unzip.getSkipHeadS1());
 
             if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
@@ -262,28 +232,7 @@ public class DataArchiveAction {
             }
             map.put("CHANNEL2",chanel2);
 
-            String filePath = "";
-            switch (dat2.toString().split("/")[1]){
-                case "KJ125ZL":
-                    filePath = dat2.toString().replace("/KJ125ZL","Z:");
-                    break;
-                case "KJ125ZL_2":
-                    filePath = dat2.toString().replace("/KJ125ZL_2","Y:");
-                    break;
-                case "/pools/POOL/TMP":
-                    filePath = dat2.toString().replace("/pools/POOL/TMP","Z:");
-                    break;
-                case "/pools/POOL/WORk":
-                    filePath = dat2.toString().replace("/pools/POOL/WORk","Y:");
-                    break;
-                case "raw":
-                    filePath = "S:"+dat2;
-                    break;
-                case "ncsfs":
-                    filePath = dat2.toString().replace("/ncsfs","T:");
-                    break;
-            }
-            map.put("SYNCPARAFILE2",filePath);
+            map.put("SYNCPARAFILE2",MyHelper.FilePath(dat2));
             map.put("SKIPHEAD2",unzip.getSkipHeadS2());
             if (unzip.getReadBytesS2()==null||unzip.getReadBytesS2().equals("0")){
                 map.put("READBYTES2",dat2.length());
@@ -307,10 +256,9 @@ public class DataArchiveAction {
         }else {
             template=UnzipParaTemplate.TASK_BASE_FILE;
         }
-        String str=template.generateParaString(map);
         File f=new File(Config.unzip_bak_dir, pPath + "UNZIP_BASE_"+map.get("YYYYMMDD_XXXXXX")+"_"+items[0]+"_"+items[2]+".param.xml");
-        Files.createDirectories(f.getParentFile().toPath());  //必须先尝试创建各级目录
-        Files.write(f.toPath(),str.getBytes("UTF-8"));        //参数文件必须规定为UTF-8编码
+        MyHelper.CreateDirectory(f.getParentFile());
+        Files.write(f.toPath(),template.generateParaString(map).getBytes("UTF-8"));        //参数文件必须规定为UTF-8编码
         //todo 创建解压缩文件的时候同时创建一个cancel文件放到cancel文件夹内,直接放到根目录
         Thread.sleep(1000);
         map.put("TARGET_ACTIVITY_ID","UNZIP_BASE_"+map.get("YYYYMMDD_XXXXXX"));
@@ -319,7 +267,7 @@ public class DataArchiveAction {
         UnzipParaTemplate template1 = UnzipParaTemplate.TASK_BASE_FILE;
         String strCancel = template1.generateParaString(map);
         File cancelF = new File(Config.unzip_cancel,"UNZIP_BASE_"+map.get("YYYYMMDD_XXXXXX")+"_"+items[0]+"_"+items[2]+".param.xml");
-        Files.createDirectories(cancelF.getParentFile().toPath());
+        MyHelper.CreateDirectory(cancelF.getParentFile());
         Files.write(cancelF.toPath(),strCancel.getBytes("UTF-8"));
         //todo 取消的文件
         UnzipConfirm unzipConfirm = new UnzipConfirm();
@@ -327,4 +275,5 @@ public class DataArchiveAction {
         unzipConfirm.setCancelActivityId(cancelF.toString());
         return unzipConfirm;
     }
+
 }

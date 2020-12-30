@@ -66,35 +66,4 @@ public class DBUtil {
         }
     }
 
-    /*private static Connection conn = null;
-    static
-    {
-        try
-        {
-            Properties properties = new Properties();
-            properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("BusinessControl.properties"));
-            String db_url = properties.getProperty("db_url");
-            String db_user = properties.getProperty("db_user");
-            String db_password =  properties.getProperty("db_password");
-            // 1.加载驱动程序
-            Class.forName(properties.getProperty("db_driver"));
-            // 2.获得数据库的连接
-            conn = DriverManager.getConnection(db_url, db_user, db_password);
-        }
-        catch (ClassNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Connection getConnection()
-    {
-        return conn;
-    }*/
 }
