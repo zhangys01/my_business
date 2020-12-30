@@ -5,12 +5,9 @@ import com.business.business.config.Config;
 import com.business.business.entity.WorkflowOrder;
 import com.business.business.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -32,6 +29,8 @@ public class ScheduleHoldTask {
     DataArchiveAction dataArchiveAction;
     @Resource
     QATaskAction qaTaskAction;
+    @Resource
+    PRtaskAction pRtaskAction;
     //3.添加定时任务
 
     @Scheduled(cron = "0/5 * * * * ? ")   //第0秒钟触发，每5秒中触发一次
@@ -59,7 +58,6 @@ public class ScheduleHoldTask {
                             break;
                         case "PRTask":
                             orderService.updateById(order);
-                            PRtaskAction pRtaskAction = new PRtaskAction();
                             pRtaskAction.doTriggerQATask(order);
                             break;
                     }
@@ -95,7 +93,6 @@ public class ScheduleHoldTask {
             t.setOrderStatus("4");
             t.setEndTime(DateUtil.getTime());
             orderService.updateById(t);
-            // logger.error("failed to parse DESC file: " + desc, e);
         }
         return  result;
     }

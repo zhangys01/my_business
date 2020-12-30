@@ -4,6 +4,7 @@ import com.business.business.config.Config;
 import com.business.business.entity.WorkflowOrder;
 import com.business.business.enums.Channel;
 import com.business.business.util.LogUtil;
+import com.business.business.util.MyHelper;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -73,9 +74,8 @@ public class R0Meta {
         sb.append("  <ReceiveEndTime>" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ds[1].getTime() + 8 * 60 * 60 * 1000) + "</ReceiveEndTime>\n");
         sb.append("</S0Meta>");
         File metaDir = new File(Config.dataBank_dir+"/"+items[0]+"/SIGNAL/"+items[3].substring(0,6)+"/"+items[3]);
-        if (!metaDir.exists()||!metaDir.isDirectory()){
-            Files.createDirectories(metaDir.toPath());
-        }
+        MyHelper.CreateDirectory(metaDir.getParentFile());
+
         //原始码流元数据文件的绝对路径即为：将原始码流数据文件的后缀.dat替换为.meta.xml
         File meta = new File(metaDir,signalFile.getName().replace(".dat", ".meta.xml"));
         Files.write(meta.toPath(), sb.toString().getBytes("UTF-8")); //注意编码

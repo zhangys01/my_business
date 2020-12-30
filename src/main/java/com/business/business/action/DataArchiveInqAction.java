@@ -10,7 +10,9 @@ import com.business.business.enums.*;
 import com.business.business.message.*;
 import com.business.business.util.DateUtil;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.swing.*;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -35,18 +37,18 @@ import java.util.List;
  */
 public class DataArchiveInqAction {
         private static final Logger logger = Logger.getLogger(DataArchiveInqAction.class);
-
         //todo 每个action都创建新实例，因此域变量不会共享冲突
+        @Resource
         private ArchiveWorkflowInfo wi;
         //todo newAddby kiven 2019/2/28
         private ProcessInfoImpl processInfo;
+        @Autowired
         private WorkFlowOrderService orderService;
+
         private Marshaller marshaller;
         private static Unmarshaller unmarshaller;
-        public DataArchiveInqAction() throws Exception {
-            //初始化schema
-            // InstructionType.initializeSchemas();
 
+        public DataArchiveInqAction() throws Exception {
             //注意，以包的形式构建，需在包目录下的jaxb.index文件中加入所有的映射类名（只需加最外层类，而父类和引用的类都不需要加入）
             JAXBContext jc = JAXBContext.newInstance(QATask.class.getPackage().getName());      //以包形式构建xml，JAXBC可将xml与类相互转换
             unmarshaller = jc.createUnmarshaller();
@@ -54,11 +56,6 @@ public class DataArchiveInqAction {
             //standard properties
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            //eclipse-specified properties  todo 如何设置输出empty标签的格式？默认为<e/>，如何设为<e></e>？赋值""而不是null？
-            //marshaller.setProperty(MarshallerProperties.INDENT_STRING, "    "); //TAB
-
-            //启动后台检查线程
-//        new TaskCheckThread(this);
         }
 
 

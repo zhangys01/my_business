@@ -18,7 +18,9 @@ import com.business.business.util.DateUtil;
 import com.business.business.util.MyHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -46,17 +48,19 @@ import java.util.Properties;
  */
 public class QATaskInqAction  {
     private static final Logger logger = Logger.getLogger(QATaskInqAction.class);
+    @Resource
     private ProcessInfoImpl processInfoImpl;
+    @Autowired
     private WorkFlowOrderService orderService;
+    @Autowired
     private McatManagerService mcatService;
+    @Autowired
+    private ProcessInfoService processService;
+
     private Marshaller marshaller;
     private static Unmarshaller unmarshaller;
-    private ProcessInfoService processService;
-    private Properties properties = new Properties();
-    public QATaskInqAction() throws Exception {
-        //初始化schema
-        // InstructionType.initializeSchemas();
 
+    public QATaskInqAction() throws Exception {
         //注意，以包的形式构建，需在包目录下的jaxb.index文件中加入所有的映射类名（只需加最外层类，而父类和引用的类都不需要加入）
         JAXBContext jc = JAXBContext.newInstance(QATask.class.getPackage().getName());      //以包形式构建xml，JAXBC可将xml与类相互转换
         unmarshaller = jc.createUnmarshaller();
@@ -64,18 +68,9 @@ public class QATaskInqAction  {
         //standard properties
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        //eclipse-specified properties  todo 如何设置输出empty标签的格式？默认为<e/>，如何设为<e></e>？赋值""而不是null？
-        //marshaller.setProperty(MarshallerProperties.INDENT_STRING, "    "); //TAB
-
-        //启动后台检查线程
-//        new TaskCheckThread(this);
     }
 
-
-
-
     public TaskBasicRepInfo generateTaskInfo(QATaskWorkflowInfo wi)throws Exception{
-        //orderService = new WorkFlowOrderService();
         TaskBasicRepInfo ret=new TaskBasicRepInfo();
         ret.taskSerialNumber=wi.taskId;
         ret.jobTaskID= MyHelper.string2StringList(wi.jobTaskID, String2ListXmlAdapter.DELIMIT);
@@ -115,11 +110,9 @@ public class QATaskInqAction  {
                 continue;
             }
 
-            //剩下的是wi.state== QATaskWorkflowInfo.STATE_PARTIAL||QATaskWorkflowInfo.STATE_SUCCESS
             //todo 简化处理，只有成功或部分成功时，才列出详细的DataExecuteInfo
             //如果查询元数据失败，则不列出详细的DataExecuteInfo
             //分模式
-
                 File reportFile = null;
                 try{
                     t.QAreportFileName=new File(wi.QAReportFile).getName();

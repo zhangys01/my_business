@@ -27,7 +27,6 @@ public enum ResponseType {   //返回给OMO的响应类型。
     StatusRep("StatusRep.xsd","系统综合状态信息-质量监测");
 
     private String xsdFileName;
-    private Schema schema;  //每种类型都保持自己的Schema实例，避免频繁创建
     private String title;
 
     private ResponseType(String xsdFileName, String title) {
@@ -71,23 +70,4 @@ public enum ResponseType {   //返回给OMO的响应类型。
         response.createdTime= DateUtil.getTime();
         response.authorInfo= authorInfo;
     }
-
-    public void schemaValidate(File xmlFile) throws Exception {
-        schema.newValidator().validate(new StreamSource(xmlFile));  //一个Validator实例只能使用一次，所以必须每次都新建
-        /*// parse an XML document into a DOM tree
-        DocumentBuilder processor = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document document = processor.parse(xmlFile);
-        // create a Validator instance and validate the DOM tree
-        schema.newValidator().validate(new DOMSource(document));*/
-    }
-
-    //如果要使用此枚举类进行schema验证，则必须先调用此方法进行schema初始化
-    public static void initializeSchemas() throws Exception {
-        for(ResponseType e: ResponseType.values()){  //依次创建每个类型的schema，一旦错误即抛出
-            URL url=ClassLoader.getSystemResource(e.xsdFileName);
-            if(url==null) throw new IOException(e.xsdFileName+" not found!");
-            e.schema=SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(url.toString()));
-        }
-    }
-
 }
