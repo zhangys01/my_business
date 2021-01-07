@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.business.business.dao.WorkFlowOrderDao">
+<mapper namespace="com.business.dao.WorkFlowOrderDao">
 
-	<select id="selectList" parameterType="String" resultType="com.business.business.entity.WorkflowOrder">
-	select * from workflow_order where orderStatus = #{0} order by taskPriority desc,startTime asc limit 5
-	</select><!-- 新增-->
-	<select id="selectRunList" parameterType="String" resultType="com.business.business.entity.WorkflowOrder">
-	select * from workflow_order where orderStatus = #{orderStatus}
-	</select><!-- 新增-->
-	<!-- 通过ID获取数据 -->
-	<select id="findById" parameterType="String" resultType="com.business.business.entity.WorkflowOrder">
-		select * from	workflow_order		where taskSerialNumber = #{taskId}
+	<select id="selectList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
+	select * from workflow_order where orderStatus = #{0} order by taskPriority desc,startTime
 	</select>
-	<select id="findDataskByJobId" parameterType="String"  resultType="com.business.business.entity.WorkflowOrder">
+	<select id="selectProductList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
+	select * from workflow_order where orderStatus = #{orderStatus} and taskMode='PRTask'
+	</select>
+
+	<select id="selectDataskList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
+	select * from workflow_order where orderStatus = #{orderStatus} and taskMode='DATask'
+	</select>
+
+	<select id="selectQataskList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
+	select * from workflow_order where orderStatus = #{orderStatus} and taskMode!='PRTask' and taskMode!='DATask'
+	</select>
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="String" resultType="com.business.entity.WorkflowOrder">
+		select * from	workflow_order where taskSerialNumber = #{taskId}
+	</select>
+	<select id="findDataskByJobId" parameterType="String"  resultType="com.business.entity.WorkflowOrder">
 		SELECT * FROM	workflow_order where jobTaskID = #{jobTaskId} and taskMode='DATask' order BY  startTime desc limit 1
 	</select>
 </mapper>

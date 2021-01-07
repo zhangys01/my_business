@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.dao.NomalManagerDao">
+
+    <delete id="deleteByJobtaskId" parameterType="String" >
+		delete from ${tableName} where jobtaskid=#{jobtaskId}
+	</delete>
+	<delete id="deleteProductIdByL1A" parameterType="String" >
+		delete from ${tableName} where productid=#{PRODUCTID_L1A}
+	</delete>
+	<delete id="deleteProductIdByL2A" parameterType="String" >
+		delete from ${tableName} where productid=#{PRODUCTID_L2A}
+	</delete>
+	<select id="getL2AInfo" parameterType="String" resultType="com.business.entity.Ml2Info">
+		select t2a.productid,t1a.sceneid,t2a.notecreatetime from GT_M_L2 t2a,GT_M_L1 t1a
+			where t2a.productid_l1a=t1a.productid
+			and t2a.jobtaskid=#{jobtaskid} and t1a.sceneid=#{scenid}
+	</select>
+
+	<select id="getL1product" parameterType="String" resultType="com.business.entity.NomalProduct">
+		select * from gt_m_l1 where sceneid = #{productId}
+	</select>
+	<select id="getL2product" parameterType="String" resultType="com.business.entity.NomalProduct">
+		select * from gt_m_l2 where productid =#{productId}
+	</select>
+</mapper>

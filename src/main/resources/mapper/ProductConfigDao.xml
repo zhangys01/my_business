@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.business.dao.ProductConfigDao">
+
+    <select id="getL0Info" parameterType="String" resultType="com.business.entity.ProductUnzipConfig">
+        select * from product_unzip_config where is_unzip=#{isUnzip}
+    </select>
+
+</mapper>
