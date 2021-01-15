@@ -1,6 +1,7 @@
 package com.business.util;
 
 import com.business.Service.ProcessInfoService;
+import com.business.config.Config;
 import com.business.entity.ProcessInfo;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +27,19 @@ import java.io.StringReader;
 public class ProcessUtil {
     private static final Logger logger = Logger.getLogger(ProcessUtil.class);
     @Autowired
-    private static ProcessInfoService processInfoService;
+    private ProcessInfoService processInfoService;
 //todo 修改webservice方式为redis方式
-    public static String submitProcess(String orderXml,int waitTimeout) throws Exception{
+    public  String submitProcess(String orderXml,int waitTimeout) throws Exception{
        //向工作流引擎提交流程订单，waitTimeout为提交订单后等待记录创建的超时时间(秒)。记录创建成功则返回orderId，否则抛异常。
         logger.debug("submitting process-order: " + orderXml);
         String orderId=validateOrder(orderXml);
-        Jedis redis = new Jedis("10.5.6.225",8715);
+        Jedis redis = new Jedis(Config.redisIp,Config.redisPort);
         redis.lpush("dpps:queue:order",orderXml);
         //todo 即使订单不规范、或其它后台错误，ws服务端都不会抛异常，所以并不能认为流程一定创建成功。
         //可通过查询数据库来确认！有一定延迟，需等待片刻！
         long waitTotal = 0;  //秒
         //TODO 先休眠五秒，再查询数据库
-        Thread.sleep(5000);
+        //Thread.sleep(5000);
         do {
             ProcessInfo info = processInfoService.getById(orderId);
             if (info!=null) {

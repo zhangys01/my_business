@@ -84,12 +84,9 @@ public class QATaskAction{
                             case "CASEARTH":
                             case "ZY-3B":
                             case"CSES":
-                                //todo 归档任务不发起R0Report任务
-                                List<GtRr0> gtrR0List = gtRr0ManagerService.listByJobId(order.getJobTaskID());
-                                if (gtrR0List.size()==0){
                                     //todo S1Fili和S2File 查询集中存储？
-                                    String S1ReportOrderXml=null,S2ReportOrderXml=null;
-                                    String satellite = order.getSatelliteName().replace("-","");
+                                String S1ReportOrderXml=null,S2ReportOrderXml=null;
+                                String satellite = order.getSatelliteName().replace("-","");
                                 List<String>datList = new ArrayList<>();
                                 datList = processQATask(order);
                                 if (datList.size()==0||datList==null){
@@ -120,7 +117,6 @@ public class QATaskAction{
                                     }
                                 }
                                     break;
-                                }
                         }
                     }
                      if (taskMode.contains("Q62")){
@@ -381,7 +377,7 @@ public class QATaskAction{
         String outDir = "";
         //todo 判断输出路径是否为空，不为空则指定路径
         if (t.getProductLevel().equals("L1")){
-            if (t.getOut_productdir().equals("")){
+            if ("".equals(t.getOut_productdir())||t.getOut_productdir()==null){
                 L1Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId);
                 MyHelper.CreateDirectory(L1Dir);
             }else{
@@ -434,8 +430,6 @@ public class QATaskAction{
         }
         //todo  更新产品的输出地址，压缩的时候用
         t.setOut_productdir(outDir);
-        t.setOrderStatus("2");
-        orderService.updateById(t);
         return map;
     }
 

@@ -1,0 +1,49 @@
+<process-order name="ZY1E_R0_TO_L0" id="ZY1E_R0_TO_L0_%YYYYMMDD_XXXXXX%"  orderid="ZY1E_R0_TO_L0_%YYYYMMDD_XXXXXX%" priority="0" queue="PR_que_pro" platform="%TASKSERIALNUMBER%">
+
+	<task name="125_UpdateDB" id="ZY1E_UpdateDB_R0META_%YYYYMMDD_XXXXXX%" orderid="ZY1E_R0_TO_L0_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<metaFileName>%S1META%</metaFileName>
+			<metaFileName>%S2META%</metaFileName>
+			<reportFileName></reportFileName>
+			<satellite>%SATELLITE%</satellite>
+			<productLevel>R0</productLevel>
+			<taskId>%JOBTASKID%</taskId>
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+	<task name="125_UNZIP" id="ZY1E_UNZIP_%YYYYMMDD_XXXXXX%" orderid="ZY1E_R0_TO_L0_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<taskSerialNumber>%TASKSERIALNUMBER%</taskSerialNumber>
+			<taskId>%JOBTASKID%</taskId>
+			<satellite>%SATELLITE%</satellite>
+			<taskbasefile1>%TASKBASEFILE1%</taskbasefile1>
+			<taskbasefile2>%TASKBASEFILE2%</taskbasefile2>
+			<unzipoutputdir>%OUTPUTDIR%</unzipoutputdir>
+			<waitTime>60</waitTime>     <!--每次启动解压之前等待上轮资源释放的时间（秒）-->
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+	<task name="ZY1E_TriggerCatalog" id="ZY1E_TriggerCatalog_%YYYYMMDD_XXXXXX%" orderid="ZY1E_R0_TO_L0_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<satellite>%SATELLITE%</satellite>
+			<taskSerialNumber>%TASKSERIALNUMBER%</taskSerialNumber>
+			<taskid>%JOBTASKID%</taskid>
+			<signalid_S1>%SIGNALID1%</signalid_S1>
+			<signalid_S2>%SIGNALID2%</signalid_S2>
+			<unzipoutputdir>%OUTPUTDIR%</unzipoutputdir>
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+</process-order>

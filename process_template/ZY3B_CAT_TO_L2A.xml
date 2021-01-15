@@ -1,0 +1,115 @@
+<process-order name="ZY3_CAT_TO_L2A" id="ZY3_CAT_TO_L2A_%YYYYMMDD_XXXXXX%" orderid="ZY3_CAT_TO_L2A_%YYYYMMDD_XXXXXX%" priority="0" queue="CAS-Nodes" platform="%TASKSERIALNUMBER%">
+	<!--task行内容可以修改-->
+	<task name="ZY3_RadCorrect" id="ZY3_RadCorrect_%YYYYMMDD_XXXXXX%" orderid="ZY3_CAT_TO_L2A_%YYYYMMDD_XXXXXX%" priority="0">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<satellite>%SATELLITE%</satellite>
+			<sensor>%SENSOR%</sensor>
+			<!--接收站名称-->
+			<station>%STATION%</station>
+			<Band>B1</Band>
+			<!-- B1/B2/B3/B4/B5     -->
+			<productid>%PRODUCTID_L1A%</productid>
+			<!--生成的产品ID-->
+			<sceneid>%SCENEID%</sceneid>
+			<!--对应景ID-->
+			<taskid>%TASKID%</taskid>
+			<!--所属业务任务ID，常规流程时为作业任务编号；运管流程时为任务单流水号-->
+			<level>LEVEL1A</level>
+			<!--int类型 是否做辐射校正 :0,不做；1，做-->
+			<rad>1</rad>
+			<!--int类型 是否做去噪处理 :0,不做；1，做-->
+			<do_denoise>0</do_denoise>
+			<!--int类型 是否做mtf :0,不做；1，做-->
+			<do_mtf>0</do_mtf>
+			<!--int类型 是否做太阳高度角校正 :0,不做；1，做-->
+			<do_sun_correction>0</do_sun_correction>
+			<!--int类型 是否做地形校正:0,不做；1，做-->
+			<do_terrain_correction>0</do_terrain_correction>
+			<do_raley>0</do_raley>
+			<sensor_correction>IMG</sensor_correction>
+			<earth_model>WGS 84</earth_model>
+			<project_model>UTM</project_model>
+			<resample_kernal>BI</resample_kernal>
+			<!--多光谱raw文件全路径名-->
+			<in_unpackfile_NAD>%UNPACKFILE_NAD%</in_unpackfile_NAD>
+			<in_unpackfile_FWD>%UNPACKFILE_FWD%</in_unpackfile_FWD>
+			<in_unpackfile_BWD>%UNPACKFILE_BWD%</in_unpackfile_BWD>
+			<in_unpackfile_MUX>%UNPACKFILE_MUX%</in_unpackfile_MUX>
+			<in_catDir></in_catDir>
+			<!--string类型 输入景元数据全路径-->
+			<in_metafile>%METAFILE%</in_metafile>
+			<!--string类型 输出产品目录-->
+			<out_productdir>%DIR_L1A%</out_productdir>
+			<!--string类型 工作目录-->
+			<work_dir>%WORK_DIRL1A%</work_dir>
+			<server_address>172.19.4.119</server_address>
+			<!-- 发送进度消息的地址和端口  -->
+			<port_number>18886</port_number>
+		</params>
+	</task>	
+	<!--task可以更改-->
+	<task name="125_UpdateDB1" id="125_UpdateDB1_L1A_%YYYYMMDD_XXXXXX%" orderid="ZY3_CAT_TO_L2A_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<metaFileName>%L1META%</metaFileName>
+			<reportFileName>%L1REPORT%</reportFileName>
+			<satellite>%SATELLITE%</satellite>
+			<productLevel>L1</productLevel>
+			<taskId>%TASKID%</taskId>        <!--jobTaskID或taskSerialNumber-->
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+	
+	<!--task可以更改-->
+	<task name="ZY3_GeoCorrect" id="ZY3_GeoCorrect_%YYYYMMDD_XXXXXX%" orderid="ZY3_CAT_TO_L2A_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>  
+		<outputfilelist/>  
+		<params>
+			<productid>%PRODUCTID_L2A%</productid>  <!--生成的产品ID-->
+			<productid_L1A>%PRODUCTID_L1A%</productid_L1A>  <!--对应L1A产品ID-->
+			<taskid>%TASKID%</taskid>  <!--所属业务任务ID，常规流程时为作业任务编号；运管流程时为任务单流水号-->
+			<satellite>%SATELLITE%</satellite>  <!--高分五号为GF5,不能是GF05!-->
+			<sensor>%SENSOR%</sensor>
+			<Band>B1</Band>  <!--默认波段为B1，高五此项无意义-->
+			<earth_model>WGS 84</earth_model>
+			<project_model>UTM</project_model>
+			<resample_kernal>%RESAMPLE_KERNAL%</resample_kernal>
+			<!--待校正的1A级影像全路径,根据1级影像路径更改-->
+			<in_image1Afile>%IMAGEFILE_L1A%</in_image1Afile>
+			<!--待校正的1A级影像对应rpc全路径，根据1级影像路径更改-->
+			<in_rpcfile>%RPCFILE_L1A%</in_rpcfile>
+			<!--TLC时的路径-->
+			<in_image1Afile_BWD>%IMAGEFILE_BWD%</in_image1Afile_BWD>
+			<in_rpcfile_BWD>%RPCFILE_BWD%</in_rpcfile_BWD>
+			<in_image1Afile_FWD>%IMAGEFILE_FWD%</in_image1Afile_FWD>
+			<in_rpcfile_FWD>%RPCFILE_FWD%</in_rpcfile_FWD>
+			<in_image1Afile_NAD>%IMAGEFILE_NAD%</in_image1Afile_NAD>
+			<in_rpcfile_NAD>%RPCFILE_NAD%</in_rpcfile_NAD>
+			<!--输出产品目录，可更改-->
+			<out_productdir>%DIR_L2A%</out_productdir>
+			<!--工作目录（临时文件目录），可更改-->
+			<work_dir>%WORK_DIRL2A%</work_dir>
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+	
+	<!--task可以更改-->
+	<task name="125_UpdateDB2" id="125_UpdateDB2_L2A_%YYYYMMDD_XXXXXX%" orderid="ZY3_CAT_TO_L2A_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<metaFileName>%L2META%</metaFileName>
+			<reportFileName>%L2REPORT%</reportFileName>
+			<satellite>%SATELLITE%</satellite>
+			<productLevel>L2</productLevel>
+			<taskId>%TASKID%</taskId>        <!--jobTaskID或taskSerialNumber-->
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+</process-order>

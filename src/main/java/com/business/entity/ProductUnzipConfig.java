@@ -1,5 +1,6 @@
 package com.business.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -8,6 +9,7 @@ public class ProductUnzipConfig {
     @TableId(value = "id")
     public int id;
     public String ip;//压缩的ip
+    @TableField(value = "is_unzip")
     public String is_unzip;//是否能压缩，0可以，1被占用
 
     public int getId() {

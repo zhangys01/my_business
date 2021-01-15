@@ -1,0 +1,27 @@
+<process-order name="KJ125_Q64" id="KJ125_Q64_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q64_%YYYYMMDD_XXXXXX%" priority="0" queue="PR_que_pro" platform="%TASKSERIALNUMBER%">
+
+	<task name="125_Q64Report" id="125_Q64Report_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q64_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist num="1">
+			<report>%QAREPORT%</report>                 <!-- 输出的报表文件绝对路径-->
+		</outputfilelist>
+		<params>
+			<taskId>%TASKSERIALNUMBER%</taskId>   <!--任务单流水号-->
+			<taskMode>Q64</taskMode>
+			<jobTaskId1>%JOBTASKID1%</jobTaskId1>    <!--作业任务编号1-->
+			<jobTaskId2>%JOBTASKID2%</jobTaskId2>    <!--作业任务编号2-->
+			<satellite>%SATELLITE%</satellite>     <!--卫星简称，如：GF01-->
+			<sensor>%SENSOR%</sensor>              <!--传感器，如：2mCCD-->
+			<orbit>%ORBIT%</orbit>                         <!--轨道号-->
+			<diffTxt>%DIFFTXT%</diffTxt>                        <!--算法输出的差异性文本文件绝对路径-->
+			<report_job1_S1>%REPORT1_S1%</report_job1_S1>             <!--算法输出的各原始码流质量报告绝对路径，没有时填空-->
+			<report_job2_S1>%REPORT2_S1%</report_job2_S1>
+			<report_job1_S2>%REPORT1_S2%</report_job1_S2>
+			<report_job2_S2>%REPORT2_S2%</report_job2_S2>
+
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+</process-order>

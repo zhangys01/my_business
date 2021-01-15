@@ -1,0 +1,72 @@
+<process-order name="ZY1E_L0_TO_CAT" id="ZY1E_L0_TO_CAT_%YYYYMMDD_XXXXXX%" orderid="ZY1E_L0_TO_CAT_%YYYYMMDD_XXXXXX%"
+               priority="0" queue="PR_que_pro" platform="%TASKSERIALNUMBER%">
+   <task name="ZY1E_Catalog" id="ZY1E_Catalog_%YYYYMMDD_XXXXXX%" orderid="ZY1E_L0_TO_CAT_%YYYYMMDD_XXXXXX%"
+          priority="0">
+        <!--编目的时候需要先进行辅助数据的解析，辅助数据的格式按照资源G5的格式-->
+        <inputfilelist/>
+        <outputfilelist/>
+        <params>
+            <satellite>%SATELLITE%</satellite>
+            <!--载荷支持VNIR和SWIR单相机的编目和AHSI双相机联合编目-->
+            <sensor>%SENSOR%</sensor>
+            <taskid>%TASKID%</taskid>
+            <!--对应S1通道原始码流ID，没有时填空,GF04卫星只有一个通道。-->
+            <signalid1>%SIGNALID1%</signalid1>
+            <signalid2>%SIGNALID2%</signalid2>
+            <segmentnum1>01</segmentnum1>
+            <!--生成的景ID前缀，每景的景ID为：前缀_nnn (其中nnn为：001-999)-->
+            <sceneidprefix>%SCENEIDPREFIX%</sceneidprefix>
+            <in_unpackfile_PA>%UNPACKFILE_PA%</in_unpackfile_PA>
+            <in_unpackfile_MS>%UNPACKFILE_MS%</in_unpackfile_MS>
+            
+            <!--编目结果的输出路径，输出每景的编目浏览图、编目的拇指图，编目的元数据每一景还是一个编目元数据文件-->
+            <out_scenedir>%OUT_SCENEDIR%</out_scenedir>
+            <server_address>172.19.4.119</server_address>
+            <port_number>18886</port_number>
+        </params>
+    </task>
+
+    <task name="125_UpdateDB1" id="125_UpdateDB1_%YYYYMMDD_XXXXXX%" orderid="ZY1E_L0_TO_CAT_%YYYYMMDD_XXXXXX%">
+        <inputfilelist/>
+        <outputfilelist/>
+        <params>
+            <metaFileName>%L0META%</metaFileName>
+            <reportFileName>%L0REPORT%</reportFileName>
+            <satellite>%SATELLITE%</satellite>
+            <productLevel>L0</productLevel>
+            <taskId>%TASKID%</taskId>
+            <segmentId>%SCENEIDPREFIX%</segmentId>
+            <!--jobTaskID或taskSerialNumber-->
+
+            <server_address>172.19.4.119</server_address>
+            <port_number>18886</port_number>
+        </params>
+    </task>
+<!--task可以更改-->
+	<task name="125_VALUE1" id="125_VALUE1_%YYYYMMDD_XXXXXX%" orderid="ZY1E_L0_TO_CAT_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<type>L0</type>                             <!-- R0 / L1A / L2A -->
+			<sign>%SCENEIDPREFIX%</sign>   <!-- signalID / productID-->
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+    <task name="125_UpdateDB2" id="125_UpdateDB2_%YYYYMMDD_XXXXXX%" orderid="ZY1E_L0_TO_CAT_%YYYYMMDD_XXXXXX%">
+        <inputfilelist/>
+        <outputfilelist/>
+        <params>
+            <reportFileName>%CAT_REPORT%</reportFileName>
+            <metaFileName>%CAT_META%</metaFileName>
+            <satellite>%SATELLITE%</satellite>
+            <productLevel>CAT</productLevel>
+            <taskId>%TASKID%</taskId>
+            <segmentId>%SCENEIDPREFIX%</segmentId>
+            <!--jobTaskID或taskSerialNumber-->
+            <server_address>172.19.4.119</server_address>
+            <port_number>18886</port_number>
+        </params>
+    </task>
+
+</process-order>

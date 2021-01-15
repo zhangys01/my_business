@@ -4,7 +4,7 @@
 <mapper namespace="com.business.dao.GtRr0ManagerDao">
 
     <select id="listByJobId" parameterType="String" resultType="com.business.entity.GtRr0">
-        select * from GtRr0 where taskSerialNumber = #{taskSerialNumber}
+        select * from gt_r_r0 where jobtaskid = #{taskId}
     </select>
 
 </mapper>

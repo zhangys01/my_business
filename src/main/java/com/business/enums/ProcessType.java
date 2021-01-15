@@ -1,5 +1,6 @@
 package com.business.enums;
 
+import com.business.config.Config;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -51,11 +52,15 @@ public enum ProcessType {   //预先定义的流程名
      */
     public String generateOrderXml(Map<String, Object> params) throws Exception {
         //每次都加载模板文件，这样可支持实时更新模板文件而无需重启。
-        URL url = ClassLoader.getSystemResource(orderTemplateFileName);
-        if (url == null) throw new IOException("order template file not found: " + orderTemplateFileName);
+       // URL url = ClassLoader.getSystemResource(orderTemplateFileName);
+//        URL url =ProcessType.class.getClassLoader().getSystemResource(orderTemplateFileName);
+//        if (url == null) throw new IOException("order template file not found: " + orderTemplateFileName);
         //todo 订单模板文件必须规定为UTF-8编码
-        String order = new String(Files.readAllBytes(new File(url.getPath()).toPath()), "UTF-8");
+        //String order = new String(Files.readAllBytes(new File(url.getPath()).toPath()), "UTF-8");
 
+        File file = new File(Config.process_template+"/"+orderTemplateFileName);
+        if (!file.exists()) throw new IOException("order template file not found: " + orderTemplateFileName);
+        String order = new String(Files.readAllBytes(new File(file.getPath()).toPath()), "UTF-8");
         //先查找所有%key%模式，提取所有key
         final Pattern p = Pattern.compile("%(\\w+)%");
         Matcher m = p.matcher(order);

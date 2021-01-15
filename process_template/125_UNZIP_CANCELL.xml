@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="gb2312" ?>
+<DecompBasicInfo>
+	<UserId>RCAdmin</UserId>
+	<CreatedTime>%CRATETIME%</CreatedTime>
+	<TimeZone>+08:00</TimeZone>
+	<ValidSpan>1</ValidSpan>
+	<ActivityId>UNZIP_BASE_%YYYYMMDD_XXXXXX%</ActivityId>
+	<OrderId>Order001</OrderId>
+	<SuborderId>SuborderId001</SuborderId>
+	<ArchiveDir>/Joblog</ArchiveDir>
+	<ActivityType>CANCELL</ActivityType>
+	<TargetActivityId></TargetActivityId>
+	<ServiceId>ServiceId001</ServiceId>
+	<Priority>1</Priority>
+	<SatelliteId>%SATELLITE%</SatelliteId>
+	<StationId>%STATION%</StationId>
+	<OrbitId>%ORBITID%</OrbitId>
+	<SensorList>%SENSORLIST%</SensorList>
+	<DownlinkStartTime>2019-01-23 11:00:15.222</DownlinkStartTime>
+	<DownlinkEndTime>2019-01-23 12:00:15.222</DownlinkEndTime>
+
+	<RawDatSourceInfo>
+		<ChannelId>%CHANNEL%</ChannelId>
+		<SrcType>File</SrcType>
+		<!--去掉根路径的时候加上 Z: -->
+		<SrcUrl>%SYNCPARAFILE%</SrcUrl>
+		<SkipHead>%SKIPHEAD%</SkipHead>
+		<ReadBytes>%READBYTES%</ReadBytes>
+		<ReadBitrate>480</ReadBitrate>
+		<RecvOrderId>RecvOrderId001</RecvOrderId>
+	</RawDatSourceInfo>
+
+	<ImgDatDestInfo>
+		<Sensor>%SENSOR1%</Sensor>
+		<DestType>File</DestType>
+		<DestUrl>%OUTPUTDIR1%</DestUrl>
+	</ImgDatDestInfo>
+
+	<ImgDatDestInfo>
+		<Sensor>%SENSOR2%</Sensor>
+		<DestType>File</DestType>
+		<DestUrl>%OUTPUTDIR2%</DestUrl>
+	</ImgDatDestInfo>
+
+	<ImgDatDestInfo>
+		<Sensor>%SENSOR3%</Sensor>
+		<DestType>File</DestType>
+		<DestUrl>%OUTPUTDIR3%</DestUrl>
+	</ImgDatDestInfo>
+
+	<ImgDatDestInfo>
+		<Sensor>%SENSOR4%</Sensor>
+		<DestType>File</DestType>
+		<DestUrl>%OUTPUTDIR4%</DestUrl>
+	</ImgDatDestInfo>
+	
+	<SrvDatDestInfo>
+		<DestType>File</DestType>
+		<DestUrl>%OUTPUTDIR%</DestUrl>
+	</SrvDatDestInfo>
+
+	<StatusReportInfo>
+		<ReportType>UDP</ReportType>
+		<ReportUrl>192.168.13.81:12306</ReportUrl>
+	</StatusReportInfo>	
+</DecompBasicInfo>
+
+

@@ -46,6 +46,7 @@ public class Config {
     public static File unzip_in_dir;
     public static File unzip_bak_dir;
     public static File work_dir;			//武大临时工作目录，从配置文件中读取
+    public static File process_template;
 
     //注意，必须先调用此方法加载配置！
     public static void loadConfig() throws Exception {
@@ -93,6 +94,7 @@ public class Config {
         unzip_bak_dir=loadDirKey("unzip_bak_dir");
         unzip_in_dir=loadDirKey("unzip_in_dir");
         work_dir=loadDirKey("work_dir");
+        process_template = loadDirKey("process_template");
 
         move_number = loadIntKey("move_number");
         running_number = loadIntKey("running_number");

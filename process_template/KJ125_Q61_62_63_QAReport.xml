@@ -1,0 +1,22 @@
+<process-order name="KJ125_Q61_62_63_QAReport" id="KJ125_Q61_62_63_QAReport_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q61_62_63_QAReport_%YYYYMMDD_XXXXXX%" priority="0" queue="PR_que_pro" platform="%TASKSERIALNUMBER%">
+
+	<task name="KJ125_GenerateQAReport" id="KJ125_GenerateQAReport_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q61_62_63_QAReport_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist num="1">
+			<report>%QAREPORT%</report>
+		</outputfilelist>
+		<params>
+			<satellite>%SATELLITE%</satellite>     <!--卫星简称-->
+			<taskMode>%TASKMODE%</taskMode>       <!--为Q61、Q62、Q63或它们的组合，半角分号隔开。查询报告表时的taskid字段条件，对于Q61、Q62使用jobTaskId标签值；对于Q63使用taskId标签值-->
+			<jobTaskId>%JOBTASKID%</jobTaskId>   <!--作业任务编号-->
+			<taskId>%TASKID%</taskId>             <!--运管触发时为任务单流水号(taskSerialNumber,以QA开头)；常规流程自动触发时为作业任务编号(jobTaskID，以JOB开头)-->
+			<channel>%CHANNEL%</channel>          <!--为任务单中的channelID；常规流程时不指定，表示不限通道-->
+			<sensor>%SENSOR%</sensor>             <!--为任务单中的sensorName；常规流程时不指定，表示不限传感器-->
+			<dataSelectType>%DATASELECTTYPE%</dataSelectType>   <!--为任务单中的dataSelectType-->
+
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+</process-order>

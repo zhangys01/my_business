@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.nio.file.Files;
@@ -47,6 +48,8 @@ public class ReportUtil {
     private WorkFlowDataArchiveService workFlowDataArchiveService;
     @Autowired
     private Ml0InfoService ml0InfoService;
+    @Resource
+    private ProcessUtil processUtil;
     private static String QAReportFile;    //相对路径
     private static OracleProcessInfoImpl oracleInfoImpl;
     private Marshaller marshaller;
@@ -239,7 +242,7 @@ public class ReportUtil {
             orderParams = generateOrderParamsForGF_Q61_62_63_QAReport(order,orderType);
             //构建流程订单
             String orderXml = processType.generateOrderXml(orderParams);
-            String orderId = ProcessUtil.submitProcess(orderXml, Config.submit_order_timeout);
+            String orderId = processUtil.submitProcess(orderXml, Config.submit_order_timeout);
         } else {
             if (QaInfo.getStatus().equals("Completed")) {
                 order.setOrderStatus("3");
@@ -332,7 +335,7 @@ public class ReportUtil {
         String orderXml = processType.generateOrderXml(orderParams);
         logger.debug("generate process order: \n" + orderXml);
         //提交流程
-        String orderId = ProcessUtil.submitProcess(orderXml,Config.submit_order_timeout);
+        String orderId = processUtil.submitProcess(orderXml,Config.submit_order_timeout);
     }
 
     private Map<String, Object> generateOrderParamsForGF_Q64(WorkflowOrder wi) throws Exception{

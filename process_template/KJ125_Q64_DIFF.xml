@@ -1,0 +1,39 @@
+<process-order name="KJ125_Q64_DIFF" id="KJ125_Q64_DIFF_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q64_DIFF_%YYYYMMDD_XXXXXX%" priority="0" queue="PR_que_pro" platform="%TASKSERIALNUMBER%">
+
+	<task name="KJ125_DIFF" id="KJ125_DIFF_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q64_DIFF_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<first_path>%JOB1_S1%</first_path>            <!--各原始码流文件绝对路径，没有时填空-->
+			<second_path>%JOB2_S1%</second_path>
+			<first_path_2>%JOB1_S2%</first_path_2>
+			<second_path_2>%JOB2_S2%</second_path_2>
+			<text_path>%DIFFTXT%</text_path>            <!--算法输出的差异性文本文件绝对路径-->
+			<Data_Size>104857600</Data_Size>                       <!--分段大小-->
+
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+	<task name="KJ125_TriggerR0Report" id="KJ125_TriggerR0Report_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q64_DIFF_%YYYYMMDD_XXXXXX%">
+		<inputfilelist/>
+		<outputfilelist/>
+		<params>
+			<satellite>%SATELLITE%</satellite>        <!--卫星简称：GF01/GF02-->
+			<taskId>%TASKSERIALNUMBER%</taskId>      <!--任务单流水号-->
+			<jobTaskId1>%JOBTASKID1%</jobTaskId1>    <!--作业任务编号1-->
+			<jobTaskId2>%JOBTASKID2%</jobTaskId2>    <!--作业任务编号2-->
+			<job1_S1>%JOB1_S1%</job1_S1>           <!--各原始码流文件绝对路径，没有时填空-->
+			<job2_S1>%JOB2_S1%</job2_S1>
+			<job1_S2>%JOB1_S2%</job1_S2>
+			<job2_S2>%JOB2_S2%</job2_S2>
+			<diffTxt>%DIFFTXT%</diffTxt>                <!--算法输出的差异性文本文件绝对路径-->
+			<segment>100</segment>                          <!--分段大小-->
+
+			<server_address>172.19.4.119</server_address>
+			<port_number>18886</port_number>
+		</params>
+	</task>
+
+</process-order>

@@ -1,0 +1,23 @@
+<process-order name="KJ125_Q65" id="KJ125_Q65_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q65_%YYYYMMDD_XXXXXX%" priority="0" queue="PR_que_pro" platform="%TASKSERIALNUMBER%">
+
+<task name="125_Q65Report" id="125_Q65Report_%YYYYMMDD_XXXXXX%" orderid="KJ125_Q65_%YYYYMMDD_XXXXXX%">
+	<inputfilelist/>
+	<outputfilelist num="1">
+		<report>%QAREPORT%</report>
+	</outputfilelist>
+	<params>
+		<taskId>%TASKSERIALNUMBER%</taskId>   <!--任务单流水号-->
+		<taskMode>Q65</taskMode>
+		<satellite>%SATELLITE%</satellite>     <!--卫星简称，如：GF01-->
+		<sensor>%SENSOR%</sensor>               <!--传感器，如：2mCCD-->
+		<receiveStartTime>%STARTTIME%</receiveStartTime>     <!--接收开始日期，格式为yyyy-MM-dd HH:mm:ss -->
+		<receiveEndTime>%ENDTIME%</receiveEndTime>            <!--接收结束日期，格式为yyyy-MM-dd HH:mm:ss-->
+		<receiveStation>%STATION%</receiveStation>            <!--接收站。不指定则为所有接收站-->
+		<recorder>%RECORDER%</recorder>                        <!--记录器编号。不指定则为所有记录设备-->
+
+		<server_address>172.19.4.119</server_address>
+		<port_number>18886</port_number>
+	</params>
+</task>
+
+</process-order>
