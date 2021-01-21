@@ -9,6 +9,7 @@ import com.business.enums.ProcessType;
 import com.business.enums.TableName;
 import com.business.util.DateUtil;
 import com.business.util.ProcessUtil;
+import com.business.util.ReportUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,78 +37,49 @@ public class PRtaskAction {
     private NomalManagerService nomalManagerService;
     @Resource
     private QATaskAction qaTaskAction;
+    @Resource
+    private ReportUtil reportUtil;
     public void doTriggerQATask( WorkflowOrder t) throws Exception {
-        switch (t.getSatelliteName()){
-            case "GF-1B":
-            case "GF-1C":
-            case "GF-1D":
-                GFProductL2A(t);
-                break;
-            case "CESEARTH":
-                CASProductL2A(t);
-                break;
-            case"ZY-3B":
-                ZYProductL2A(t);
-                break;
-        }
-    }
-    public void GFProductL2A(WorkflowOrder t)throws Exception {
         //todo 根据订单景ID获取景
-        Mcat mcat = mcatManagerService.selectBysceneId(t.getSceneID());
-        deleteProduct("L2",mcat.getSceneid());
-        //处理每一景
+        //todo  生产订单没有jobTaskId
+        Mcat s = mcatManagerService.selectBysceneId(t.getSceneID());
+        if (t.getProductLevel().equals("L1")){
+            deleteProduct("L1",s.getSceneid());
+        }else{
+            deleteProduct("L2",s.getSceneid());
+        }
         //todo 根据是生产L1A还是都生产构建订单
+        String orderXml = "";
         if (t.getProductLevel().equals("L1")) {
-            String orderXml = ProcessType.GF1_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, mcat));
-            logger.debug("generate process order: \n" + orderXml);
+            switch (t.getSatelliteName()){
+                case "GF-1B":
+                case "GF-1C":
+                case "GF-1D":
+                    orderXml = ProcessType.GF1_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                break;
+                case "ZY-3B":
+                    orderXml = ProcessType.ZY3B_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+                case "ZY-1E":
+                    orderXml = ProcessType.ZY1E_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+            }
             //提交流程
             processUtil.submitProcess(orderXml, Config.submit_order_timeout);
         } else {
-            String orderXml = ProcessType.GF1_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, mcat));
-            logger.debug("generate process order: \n" + orderXml);
-            //提交流程
-            processUtil.submitProcess(orderXml, Config.submit_order_timeout);
-          }
-    }
-    public void ZYProductL2A(WorkflowOrder t)throws Exception{
-        //todo  生产订单没有jobTaskId
-        Mcat s = mcatManagerService.selectBysceneId(t.getSceneID());
-        if (t.getProductLevel().equals("L1")){
-            deleteProduct("L1",s.getSceneid());
-        }else{
-            deleteProduct("L2",s.getSceneid());
-        }
-        logger.info("auto-triggering QATask for: " + s.getJobtaskid());
-        //todo 根据是生产L1A还是都生产构建订单
-        if (t.getProductLevel().equals("L1")){
-            String orderXml = ProcessType.ZY3B_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,s));
-            logger.debug("generate process order: \n" + orderXml);
-            //提交流程
-            processUtil.submitProcess(orderXml, Config.submit_order_timeout);
-        }else {
-            String orderXml = ProcessType.ZY3B_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,s));
-            logger.debug("generate process order: \n" + orderXml);
-            //提交流程
-            processUtil.submitProcess(orderXml, Config.submit_order_timeout);
-        }
-    }
-    public void CASProductL2A(WorkflowOrder t)throws Exception{
-        //todo  生产订单没有jobTaskId
-        Mcat s = mcatManagerService.selectBysceneId(t.getSceneID());
-        if (t.getProductLevel().equals("L1")){
-            deleteProduct("L1",s.getSceneid());
-        }else{
-            deleteProduct("L2",s.getSceneid());
-        }
-        logger.info("auto-triggering QATask for: " + s.getJobtaskid());
-        //todo 根据是生产L1A还是都生产构建订单
-        if (t.getProductLevel().equals("L1")){
-            String orderXml = ProcessType.CAS_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,s));
-            logger.debug("generate process order: \n" + orderXml);
-            //提交流程
-            processUtil.submitProcess(orderXml, Config.submit_order_timeout);
-        }else {
-            String orderXml = ProcessType.CAS_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(),t,s));
+            switch (t.getSatelliteName()){
+                case "GF-1B":
+                case "GF-1C":
+                case "GF-1D":
+                    orderXml = ProcessType.GF1_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+                case "ZY-3B":
+                    orderXml = ProcessType.ZY3B_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+                case "ZY-1E":
+                    orderXml = ProcessType.ZY1E_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+            }
             logger.debug("generate process order: \n" + orderXml);
             //提交流程
             processUtil.submitProcess(orderXml, Config.submit_order_timeout);

@@ -1,21 +1,16 @@
 package com.business.action;
 
 import com.business.Service.NomalManagerService;
+import com.business.Service.ProcessInfoService;
 import com.business.Service.UnzipConfigService;
 import com.business.Service.UnzipConfirmService;
 import com.business.config.Config;
+import com.business.entity.ProcessInfo;
 import com.business.entity.UnzipConfig;
 import com.business.entity.UnzipConfirm;
 import com.business.entity.WorkflowOrder;
-import com.business.enums.Channel;
-import com.business.enums.ProcessType;
-import com.business.enums.Satellite;
-import com.business.enums.TableName;
-import com.business.util.DateUtil;
-import com.business.util.MyHelper;
-import com.business.util.ProcessUtil;
-import com.business.util.R0Meta;
-import com.business.util.UnzipParaTemplate;
+import com.business.enums.*;
+import com.business.util.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,8 +35,12 @@ public class DataArchiveAction {
     private UnzipConfirmService unzipConfirmService;
     @Autowired
     private UnzipConfigService unzipConfigService;
+  /*  @Autowired
+    private ProcessInfoService processInfoService;*/
     @Resource
     private ProcessUtil processUtil;
+    @Resource
+    private ReportUtil reportUtil;
 
     public void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
         File[] datFiles = dataTmpDir.listFiles(new FileFilter() {
@@ -60,7 +59,6 @@ public class DataArchiveAction {
         for (int i=0;i<tableList.size();i++){
             nomalManagerService.deleteByJobtaskId(tableList.get(i),t.getJobTaskID());
         }
-
         //将dat文件移至归档目录、生成元数据文件
         Satellite satellite=null;
         File S1File=null,S2File=null,R0Meta1=null,RoMeta2=null;     //归档后的原始码流文件。单通道情况则有一个为null
@@ -81,17 +79,36 @@ public class DataArchiveAction {
         String unzipOrderXml=null;
         Date time=new Date();//统一用一个任务创建时间
         //TODO 根据卫星分不同的Ro_to_L0
+        List<ProcessInfo>dataInfoList = new ArrayList<>();
+        //switch (reportUtil.findBianma(t.getSatelliteName())){
         switch (t.getSatelliteName()){
+            //todo GF1BCD
             case"GF-1B":
             case"GF-1C":
             case"GF-1D":
-                unzipOrderXml = ProcessType.GF1_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File,time));
+                unzipOrderXml = ProcessType.GF1_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                break;
+                //todo ZY1E cbers04A
+            case"ZY-1E":
+               /* dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"ZY1E_R0_TO_L0");
+                if(dataInfoList.size()==0) {*/
+                    unzipOrderXml = ProcessType.ZY1E_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+              //  }
+                break;
+            case "CBERS04A":
+                unzipOrderXml = ProcessType.CB4A_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
                 break;
             case"CASEARTH":
-                unzipOrderXml = ProcessType.CASEARTH_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File,time));
+                unzipOrderXml = ProcessType.CAS_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
                 break;
             case"ZY-3B":
-                unzipOrderXml = ProcessType.ZY3_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File,time));
+                unzipOrderXml = ProcessType.ZY3_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                break;
+            case"GF-6":
+                unzipOrderXml = ProcessType.GF6_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                break;
+            case"GF-7":
+                unzipOrderXml = ProcessType.GF7_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
                 break;
         }
         //提交订单。注意，先提交解压缩流程（因为解压缩流程占用资源多，先提交可能会让其先占用到资源）
@@ -100,7 +117,7 @@ public class DataArchiveAction {
         //TODO 启动检查线程
         Thread.sleep(25000);
     }
-    private Map<String,Object> generateOrderParamsForGF_R0_TO_L0(File R0Meta1, File R0Meta2, WorkflowOrder t, Satellite satellite, String jobTaskId, File S1File, File S2File, Date time) throws Exception {
+    private Map<String,Object> generateOrderParamsForGF_R0_TO_L0(File R0Meta1, File R0Meta2, WorkflowOrder t, Satellite satellite, String jobTaskId, File S1File, File S2File) throws Exception {
         //先尝试生成解压缩相关参数文件
         String signalId = null;
         if (S1File!=null){
@@ -139,48 +156,30 @@ public class DataArchiveAction {
         return map;
     }
     private UnzipConfirm generateBaseParaFile(File dat1,String chanel1,File dat2,String chanel2,WorkflowOrder t,String jobTaskId,String orderidSuffix,String signalId,String pPath) throws Exception {
+        Map<String, Object> map = new HashMap<>();
         UnzipConfig unzip = unzipConfigService.selectBySaliteName(t.getSatelliteName());
         String[] items = signalId.split("_");
-        File l0DataDir1=null,l0DataDir2 = null,l0DataDir3=null,l0DataDir4=null,srv=null;
-        File dir1=null,dir2=null,dir3=null,dir4=null,srvFile=null;
-        switch (t.getSatelliteName()){
-            case"GF-1B":
-            case"GF-1C":
-            case"GF-1D":
-            case "CASEARTH":
-                //todo 解压缩改好之后，这四个加上 Config.unzip_dir+
-                l0DataDir1 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/PAN1"));
-                l0DataDir2 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/MSS1"));
-                l0DataDir3 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/PAN2"));
-                l0DataDir4 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/MSS2"));
-                //todo Config.archive_root 替换"/KJ125ZL/DataBank/"
-                dir1 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/PAN1"));
-                dir2 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/MSS1"));
-                dir3 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/PAN2"));
-                dir4 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/MSS2"));
-                break;
-            case"ZY-3B":
-                //todo 解压缩改好之后，这四个加上 Config.unzip_dir+
-                l0DataDir1 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/NAD"));
-                l0DataDir2 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/MUX"));
-                l0DataDir3 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/FWD"));
-                l0DataDir4 = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/BWD"));
-                dir1 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/NAD"));
-                dir2 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/MUX"));
-                dir3 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/FWD"));
-                dir4 = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/BWD"));
-                break;
+        File l0DataDir=null,srv=null;
+        File dir=null,srvFile=null;
+        //switch (reportUtil.findBianma(t.getSatelliteName()))
+        List<String>sensorList1 = new ArrayList<>();
+        if (t.getSatelliteName().equals("ZY-3B")){
+            sensorList1 = Sensor.fromOMOSensor("ZY302");
+        }else {
+            sensorList1 = Sensor.fromOMOSensor(t.getSatelliteName());
+        }
+        for (int i=0;i<sensorList1.size();i++){
+            l0DataDir = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/"+sensorList1.get(i)));
+            dir = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
+            MyHelper.CreateDirectory(dir);
+            int j = i+1;
+            map.put("OUTPUTDIR"+j, l0DataDir);
         }
         //todo 解压缩改好后，这个加上Config.unzip_dir+
         srv = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/srv"));
         srvFile = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/srv"));
         MyHelper.CreateDirectory(srvFile);
-        MyHelper.CreateDirectory(dir1);
-        MyHelper.CreateDirectory(dir2);
-        MyHelper.CreateDirectory(dir3);
-        MyHelper.CreateDirectory(dir4);
 
-        Map<String, Object> map = new HashMap<>();
         map.put("CRATETIME",DateUtil.getTime());
         map.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
         map.put("ACTIVITYTYPE","NEW");
@@ -188,7 +187,6 @@ public class DataArchiveAction {
         map.put("STATION", items[4].substring(0, 2));
         map.put("ORBITID", items[2]);
         map.put("SENSORLIST",unzip.getSensorList());
-
 
         //todo  2019/10/30 新增解压缩优先级
         switch (t.getTaskPriority()){
@@ -201,7 +199,6 @@ public class DataArchiveAction {
             case "urgency":
                 map.put("PRIORITY","3");
                 break;
-
         }
         //todo 通道1
         if (dat1!=null){
@@ -216,14 +213,22 @@ public class DataArchiveAction {
             }
             map.put("CHANNEL1",chanel1);
             //todo 暂时定义四个挂载盘的路径，
-
-            map.put("SYNCPARAFILE1",MyHelper.FilePath(dat1));
-            map.put("SKIPHEAD1",unzip.getSkipHeadS1());
-
-            if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
-                map.put("READBYTES1",dat1.length());
+            if (t.getSatelliteName().equals("ZY1E")){
+                map.put("SYNCPARAFILE2",MyHelper.FilePath(dat1));
+                map.put("SKIPHEAD2",unzip.getSkipHeadS1());
+                if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
+                    map.put("READBYTES2",dat1.length());
+                }else {
+                    map.put("READBYTES2",unzip.getReadBytesS1());
+                }
             }else {
-                map.put("READBYTES1",unzip.getReadBytesS1());
+                map.put("SYNCPARAFILE1",MyHelper.FilePath(dat1));
+                map.put("SKIPHEAD1",unzip.getSkipHeadS1());
+                if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
+                    map.put("READBYTES1",dat1.length());
+                }else {
+                    map.put("READBYTES1",unzip.getReadBytesS1());
+                }
             }
         }
         //todo 通道2
@@ -238,13 +243,22 @@ public class DataArchiveAction {
                 map.put("SENSORLIST",sensor2);
             }
             map.put("CHANNEL2",chanel2);
-
-            map.put("SYNCPARAFILE2",MyHelper.FilePath(dat2));
-            map.put("SKIPHEAD2",unzip.getSkipHeadS2());
-            if (unzip.getReadBytesS2()==null||unzip.getReadBytesS2().equals("0")){
-                map.put("READBYTES2",dat2.length());
-            }else{
-                map.put("READBYTES2",unzip.getReadBytesS2());
+            if (t.getSatelliteName().equals("ZY1E")){
+                map.put("SYNCPARAFILE1",MyHelper.FilePath(dat2));
+                map.put("SKIPHEAD1",unzip.getSkipHeadS1());
+                if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
+                    map.put("READBYTES1",dat2.length());
+                }else {
+                    map.put("READBYTES1",unzip.getReadBytesS1());
+                }
+            }else {
+                map.put("SYNCPARAFILE2",MyHelper.FilePath(dat2));
+                map.put("SKIPHEAD2",unzip.getSkipHeadS1());
+                if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
+                    map.put("READBYTES2",dat2.length());
+                }else {
+                    map.put("READBYTES2",unzip.getReadBytesS1());
+                }
             }
         }
         String sensorList = unzip.getSensorList();
@@ -252,10 +266,7 @@ public class DataArchiveAction {
         map.put("SENSOR2",sensorList.split(";")[1]);
         map.put("SENSOR3",sensorList.split(";")[2]);
         map.put("SENSOR4",sensorList.split(";")[3]);
-        map.put("OUTPUTDIR1", l0DataDir1);
-        map.put("OUTPUTDIR2", l0DataDir2);
-        map.put("OUTPUTDIR3", l0DataDir3);
-        map.put("OUTPUTDIR4", l0DataDir4);
+
         map.put("OUTPUTDIR",srv);
         UnzipParaTemplate template = null;
         if (dat1==null||dat2==null){

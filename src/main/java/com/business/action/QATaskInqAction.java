@@ -425,13 +425,13 @@ public class QATaskInqAction  {
             }else{
                 switch (order.getDataSelectType()){
                     case"AutoType":
-                        ls = mcatService.selectSceneByAuto(order.getJobTaskID(),Sensor.fromOMOSensor(order.getSatelliteName(),""));
+                        ls = mcatService.selectSceneByAuto(order.getJobTaskID(),Sensor.fromOMOSensor(order.getSatelliteName()));
                         break;
                     case"Time":
-                        ls = mcatService.selectSceneByTime(order.getJobTaskID(),Sensor.fromOMOSensor(order.getSatelliteName(),""),order.getSensorStartTime(),order.getSensorEndTime());
+                        ls = mcatService.selectSceneByTime(order.getJobTaskID(),Sensor.fromOMOSensor(order.getSatelliteName()),order.getSensorStartTime(),order.getSensorEndTime());
                         break;
                     case "Full":
-                        ls = mcatService.selectSceneByFull(order.getJobTaskID(),Sensor.fromOMOSensor(order.getSatelliteName(),""));
+                        ls = mcatService.selectSceneByFull(order.getJobTaskID(),Sensor.fromOMOSensor(order.getSatelliteName()));
                         break;
                     case"custom":
                         ls = mcatService.selectByCustom(order.getSceneID().split(";"));

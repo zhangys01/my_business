@@ -19,24 +19,49 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public enum ProcessType {   //预先定义的流程名
-    GF1_R0_TO_L0,                          //原始码流单或双通道解压缩流程
+    //高分三期
+    GF6_R0_TO_L0,
+    GF7_R0_TO_L0,
+    GF6_R0_TO_R0REPORT,
+    GF7_R0_TO_R0REPORT,
+    GF6_CAT_TO_REPAIR,
+    GF6_CAT_TO_L1A,
+    GF7_CAT_TO_L1A,
+    GF6_CAT_TO_L2A,
+    GF7_CAT_TO_L2A,
+    GF6_Q63_CAT_TO_L2A,
+    GF7_Q63_CAT_TO_L2A,
+    //125
+    GF1_R0_TO_L0,
     ZY3_R0_TO_L0,
-    CASEARTH_R0_TO_L0,
-    KJ125_R0_TO_R0REPORT,           //原始码流单通道质量评价流程
+    ZY1E_R0_TO_L0,
+    CB4A_R0_TO_L0,
+
+    KJ125_R0_TO_R0REPORT,
     ZY3B_CAT_TO_L1A,
     ZY3B_CAT_TO_L2A,
     ZY3B_Q63_CAT_TO_L2A,
     GF1_CAT_TO_L1A,
     GF1_CAT_TO_L2A,
     GF1_Q63_CAT_TO_L2A,
+    ZY1E_CAT_TO_L1A,
+    ZY1E_CAT_TO_L2A,
+    ZY1E_Q63_CAT_TO_L2A,
+    CB4A_CAT_TO_L1A,
+    CB4A_CAT_TO_L2A,
+    CB4A_Q63_CAT_TO_L2A,
+
+    KJ125_Q61_62_63_QAReport,
+    KJ125_Q64,
+    ZY3_Q64_DIFF,
+    GF1_Q64_DIFF,
+    KJ125_Q64_R0REPORT,
+    KJ125_Q65,
+    //
+    CAS_R0_TO_L0,
     CAS_CAT_TO_L1A,
     CAS_CAT_TO_L2A,
-    CASEARTH_Q63_CAT_TO_L2A,
-    KJ125_Q61_62_63_QAReport,  //Q61/62/63组合模式下，仅最后生成报表的流程。Q61/62无需实施生产；Q63下各景生产放在若干独立的生产流程中，此处并不调用生产，只是在若干景生产流程结束后生成报表
-    KJ125_Q64_DIFF,                        //Q64模式下，差异性分析流程
-    KJ125_Q64,                                  //Q64模式下，仅最后生成报表的流程
-    KJ125_Q65;                                   //Q65模式生成报表流程
-
+    CAS_Q63_CAT_TO_L2A;
     //对应的流程订单模板文件名为：<流程名>.xml
     private String orderTemplateFileName = name() + ".xml";
 

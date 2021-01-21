@@ -3,10 +3,7 @@ package com.business.util;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
-import com.business.Service.Ml0InfoService;
-import com.business.Service.ProcessInfoService;
-import com.business.Service.WorkFlowDataArchiveService;
-import com.business.Service.WorkFlowOrderService;
+import com.business.Service.*;
 import com.business.action.*;
 import com.business.action.QATaskInqAction;
 import com.business.adapter.String2ListXmlAdapter;
@@ -47,6 +44,8 @@ public class ReportUtil {
     @Autowired
     private WorkFlowDataArchiveService workFlowDataArchiveService;
     @Autowired
+    private SysDictionariesService dictionariesService;
+    @Autowired
     private Ml0InfoService ml0InfoService;
     @Resource
     private ProcessUtil processUtil;
@@ -55,6 +54,11 @@ public class ReportUtil {
     private Marshaller marshaller;
     private static final int BUFFER_SIZE = 2 * 1024;
 
+    //todo 卫星分类型
+  /*  public String findBianma(String name)throws Exception{
+        SysDictionaries dictionaries = dictionariesService.getById(dictionariesService.findByName(name).getParentId());
+        return dictionaries.getBianma();
+    }*/
 
     public void ReportStatusSuccess(WorkflowOrder order,String taskmode,List<ProcessInfo> infoList)throws Exception{
         if (infoList.size()!=0 && getProcessStatus(infoList,order).equals("success")){
@@ -185,7 +189,6 @@ public class ReportUtil {
             order.setOrderStatus("4");
             orderService.updateById(order);
             //todo 生成QATaskRep
-           
             wi.state = 0;
             generateQATaskRep(wi,order);;
         }
@@ -198,7 +201,6 @@ public class ReportUtil {
                 order.setOrderStatus("3");
                 orderService.updateById(order);
                 //todo 生成QATaskRep
-               
                 wi.state = 1;
                 generateQATaskRep(wi,order);
             }else if (infoList.get(0).getStatus().equals("Aborted")){
@@ -322,7 +324,6 @@ public class ReportUtil {
             marshaller.marshal(response,tmp);
         }
         File dest=new File(Config.toOMO_sendingDir, fileName);
-        logger.info("destttt"+dest.getPath());
         Files.move(tmp.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING); //序列化成功后恢复原名。重名替换，省得麻烦
         logger.debug("generated response file: "+dest.getPath());       //debug时才会输出
     }

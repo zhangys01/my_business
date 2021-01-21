@@ -9,11 +9,15 @@ package com.business.enums;
  */
 public enum  Satellite {  //枚举名：卫星简称
 	
+    GF06("GF-6"),
+    GF07("GF-7"),
     GF1B("GF-1B"),
     GF1C("GF-1C"),
     GF1D("GF-1D"),
     ZY3B("ZY-3B"),
     ZY302("ZY302"),
+    CB4A("CB4A"),
+    CBERS04A("CBERS04A"),
     CASEARTH("CASEARTH");
 
 
@@ -32,10 +36,6 @@ public enum  Satellite {  //枚举名：卫星简称
             if(s.fullName.equals(satelliteFullName)) return s;
         }
         throw new Exception("unknown satellite name: "+satelliteFullName);
-    }
-
-    public static boolean isNewSatellite(Satellite satellite){  //是否为老站网之后的新星种
-        return true;
     }
 
 }

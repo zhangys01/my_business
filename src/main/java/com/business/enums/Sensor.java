@@ -22,7 +22,7 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
     VIMS; //多光谱VIMS
 
 
-    public static List<String> fromOMOSensor(String satellite, String omoSensor) {
+    public static List<String> fromOMOSensor(String satellite) {
         List<String>sensorList = new ArrayList<>();
         switch (satellite){
             case"GF-1B":
@@ -37,17 +37,18 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("MUX");
                 sensorList.add("TLC");
                 break;
+            case"ZY-1E":
+            case"CBERS04A":
+                sensorList.add("PAN");
+                sensorList.add("MSS");
+                break;
+            case"ZY302":
+                sensorList.add("MUX");
+                sensorList.add("NAD");
+                sensorList.add("FWD");
+                sensorList.add("BWD");
         }
         return sensorList;
-    }
-
-    public static List<String> fromOMOSensors(String satellite, List<String> omoSensors) {
-        //将运管接口定义的传感器标识，转换为内部用传感器标识
-        ArrayList<String> ret = new ArrayList<>();
-        for (String s : omoSensors) {
-            ret.addAll(fromOMOSensor(satellite, s));
-        }
-        return ret;
     }
 
     public static List<SensorDataArchiveInfo> toSimplify(List<SensorDataArchiveInfo> sas) {
@@ -63,6 +64,4 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
         }
         return sasRs;
     }
-
-
 }
