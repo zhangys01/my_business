@@ -4,21 +4,21 @@
 <mapper namespace="com.business.dao.McatManagerDao">
 
     <select id="selectCatbyJobId" parameterType="String" resultType="com.business.entity.Mcat">
-		select * from gt_m_cat where jobtaskid = #{taskId}
+		select id,sceneid,segmentid,jobtaskid,satelliteid,station,band from gt_m_cat where jobtaskid = #{taskId}
 	</select>
 	<select id="selectByFull" parameterType="Map" resultType="com.business.entity.Mcat">
-	select * from gt_m_cat where message='unknown' and stauts='SUCCEEDED' and jobtaskid = #{taskid}
+	select id,sceneid,segmentid,jobtaskid,satelliteid,station,band from gt_m_cat where message='unknown' and stauts='SUCCEEDED' and jobtaskid = #{taskid}
 	</select>
 	<select id="selectByTime" parameterType="Map" resultType="com.business.entity.Mcat">
-	select * from gt_m_cat where message='unknown'and jobtaskid = #{taskid} and stauts='SUCCEEDED' and ((scenestarttime between #{startTime} and #{endTime}) or (sceneendtime between #{startTime} and #{endTime}))
+	select id,sceneid,segmentid,jobtaskid,satelliteid,station,band from gt_m_cat where message='unknown'and jobtaskid = #{taskid} and stauts='SUCCEEDED' and ((scenestarttime between #{startTime} and #{endTime}) or (sceneendtime between #{startTime} and #{endTime}))
 	</select>
 	<select id="selectByAuto" parameterType="Map" resultType="com.business.entity.Mcat">
-	select * from gt_m_cat 	WHERE jobtaskid = #{taskid} and sensorid =#{sensor}and message='unknown' and stauts='SUCCEEDED'
+	select id,sceneid,segmentid,jobtaskid,satelliteid,station,band from gt_m_cat 	WHERE jobtaskid = #{taskid} and sensorid =#{sensor}and message='unknown' and stauts='SUCCEEDED'
 	</select>
 	<select id="selectBysceneId" parameterType="String" resultType="com.business.entity.Mcat">
-		select * from gt_m_cat where sceneid = #{secenId}
+		select id,sceneid,segmentid,jobtaskid,satelliteid,station,band from gt_m_cat where sceneid = #{secenId}
 	</select>
 	<select id="getCatInfo" parameterType="String" resultType="com.business.entity.Mcat">
-		select * from gt_m_cat where segmentid like #{segmentID} and jobtaskid= #{jobTaskID}
+		select id,sceneid,segmentid,jobtaskid,satelliteid,station,band from gt_m_cat where segmentid like #{segmentID} and jobtaskid= #{jobTaskID}
 	</select>
 </mapper>

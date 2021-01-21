@@ -4,7 +4,7 @@
 <mapper namespace="com.business.dao.ProductConfigDao">
 
     <select id="findByStatus" parameterType="String" resultType="com.business.entity.ProductUnzipConfig">
-        select * from product_unzip_config where is_unzip=#{isUnzip} limit 1
+        select id,ip,is_unzip from product_unzip_config where is_unzip=#{isUnzip} limit 1
     </select>
 
 </mapper>

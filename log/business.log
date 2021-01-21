@@ -1,0 +1,27 @@
+2021-01-21 15:24:09,626 INFO  [scheduling-1] (WorkFlowOrderServiceImpl:28) 查询执行列表出现了错误org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException
+### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
+### The error may involve com.business.dao.WorkFlowOrderDao.selectList
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException当时的状态是2
+2021-01-21 15:24:09,632 INFO  [main] (WorkFlowOrderServiceImpl:28) 查询执行列表出现了错误org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is com.alibaba.druid.pool.DataSourceDisableException
+### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
+### The error may involve com.business.dao.WorkFlowOrderDao.selectList
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is com.alibaba.druid.pool.DataSourceDisableException当时的状态是2
+2021-01-21 15:25:19,141 ERROR [scheduling-1] (ScheduleRunningDaTask:71) 修改归档任务状态失败：nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException
+### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
+### The error may involve com.business.dao.WorkFlowOrderDao.selectDataskList
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException
+2021-01-21 15:26:34,567 ERROR [scheduling-1] (ProcessInfoServiceImpl:47) org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.binding.BindingException: Parameter '0' not found. Available parameters are [platfrom, processType, param1, param2]
+2021-01-21 15:26:34,579 ERROR [scheduling-1] (ScheduleRunningQaTask:115) 更新QA任务失败：nested exception is org.apache.ibatis.exceptions.PersistenceException: 
+### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException: interrupt
+### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
+### The error may involve com.business.dao.WorkFlowOrderDao.selectQataskList
+### The error occurred while executing a query
+### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException: interrupt
+2021-01-21 15:28:45,123 ERROR [main] (ProcessInfoServiceImpl:47) org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.binding.BindingException: Parameter '0' not found. Available parameters are [platfrom, processType, param1, param2]
+2021-01-21 15:28:45,128 ERROR [scheduling-1] (ProcessInfoServiceImpl:47) org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.binding.BindingException: Parameter '0' not found. Available parameters are [platfrom, processType, param1, param2]

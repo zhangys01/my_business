@@ -9,9 +9,9 @@
 		ORDER BY t.orderid desc LIMIT 0,1
 	</select>
 	<select id="findById" parameterType="String" resultType="com.business.entity.QATaskWorkFlow">
-		select * FROM QATaskWorkFlow WHERE taskid = #{taskid}
+		select taskid,orderid,taskinfo,createtime,updatetime,originator FROM WORKFLOW_QATASK WHERE taskid = #{taskid}
 	</select>
 	<select id="getOMOQATaskWorkflowInfo" parameterType="String" resultType="com.business.entity.QATaskWorkFlow">
-		SELECT * from WORKFLOW_QATASK q, workflow_tree t where q.orderid = t.orderid and q.originator=1 and q.taskid= #{taskId}
+		SELECT taskid,orderid,taskinfo,createtime,updatetime,originator from WORKFLOW_QATASK q, workflow_tree t where q.orderid = t.orderid and q.originator=1 and q.taskid= #{taskId}
 	</select>
 </mapper>

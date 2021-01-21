@@ -39,8 +39,6 @@ public class DataArchiveAction {
     private ProcessInfoService processInfoService;*/
     @Resource
     private ProcessUtil processUtil;
-    @Resource
-    private ReportUtil reportUtil;
 
     public void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
         File[] datFiles = dataTmpDir.listFiles(new FileFilter() {

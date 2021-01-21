@@ -3,14 +3,14 @@
 
 <mapper namespace="com.business.dao.ProcessInfoDao">
     <select id="selectProcess" parameterType="String" resultType="com.business.entity.ProcessInfo">
-        select * from pd_processinfo where  platform = #{platform}
+        select processId,orderId,platform,status from pd_processinfo where  platform = #{platform}
     </select>
 
     <select id="getProcessByName" parameterType="String" resultType="com.business.entity.ProcessInfo">
-        select * from pd_processinfo where  platform= #{0} and processType = #{1} order by status limit 1
+        select processId,orderId,platform,status from pd_processinfo where  platform= #{0} and processType = #{1} order by status limit 1
     </select>
 
     <select id="getProcessList" parameterType="String" resultType="com.business.entity.ProcessInfo">
-        select * from pd_processinfo where  platform= #{0} and processType = #{1} order by createTime
+        select processId,orderId,platform,status from pd_processinfo where  platform= #{0} and processType = #{1} order by createTime
     </select>
 </mapper>

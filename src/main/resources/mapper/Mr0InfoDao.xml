@@ -4,7 +4,7 @@
 <mapper namespace="com.business.dao.Mr0InfoDao">
 
     <select id="getMr0Info" parameterType="String" resultType="com.business.entity.Mr0Info">
-        select * from GT_M_R0 where jobtaskid =#{jobtaskid}
+        select id,signalid,jobtaskid,satelliteid,channelid,stationid,receivestarttime,receiveendtime,filepath,notecreatetime,filecreatetime from GT_M_R0 where jobtaskid =#{jobtaskid}
     </select>
 
 </mapper>
