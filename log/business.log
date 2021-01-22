@@ -1,27 +1,69 @@
-2021-01-21 15:24:09,626 INFO  [scheduling-1] (WorkFlowOrderServiceImpl:28) 查询执行列表出现了错误org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.exceptions.PersistenceException: 
-### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException
-### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
-### The error may involve com.business.dao.WorkFlowOrderDao.selectList
-### The error occurred while executing a query
-### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException当时的状态是2
-2021-01-21 15:24:09,632 INFO  [main] (WorkFlowOrderServiceImpl:28) 查询执行列表出现了错误org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.exceptions.PersistenceException: 
-### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is com.alibaba.druid.pool.DataSourceDisableException
-### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
-### The error may involve com.business.dao.WorkFlowOrderDao.selectList
-### The error occurred while executing a query
-### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is com.alibaba.druid.pool.DataSourceDisableException当时的状态是2
-2021-01-21 15:25:19,141 ERROR [scheduling-1] (ScheduleRunningDaTask:71) 修改归档任务状态失败：nested exception is org.apache.ibatis.exceptions.PersistenceException: 
-### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException
-### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
-### The error may involve com.business.dao.WorkFlowOrderDao.selectDataskList
-### The error occurred while executing a query
-### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException
-2021-01-21 15:26:34,567 ERROR [scheduling-1] (ProcessInfoServiceImpl:47) org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.binding.BindingException: Parameter '0' not found. Available parameters are [platfrom, processType, param1, param2]
-2021-01-21 15:26:34,579 ERROR [scheduling-1] (ScheduleRunningQaTask:115) 更新QA任务失败：nested exception is org.apache.ibatis.exceptions.PersistenceException: 
-### Error querying database.  Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException: interrupt
-### The error may exist in file [/Users/wangkai/w_kiven/javaProject/business/target/classes/mapper/WorkFlowOrderDao.xml]
-### The error may involve com.business.dao.WorkFlowOrderDao.selectQataskList
-### The error occurred while executing a query
-### Cause: org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection; nested exception is java.sql.SQLException: interrupt
-2021-01-21 15:28:45,123 ERROR [main] (ProcessInfoServiceImpl:47) org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.binding.BindingException: Parameter '0' not found. Available parameters are [platfrom, processType, param1, param2]
-2021-01-21 15:28:45,128 ERROR [scheduling-1] (ProcessInfoServiceImpl:47) org.mybatis.spring.MyBatisSystemException: nested exception is org.apache.ibatis.binding.BindingException: Parameter '0' not found. Available parameters are [platfrom, processType, param1, param2]
+2021-01-22 16:42:45,260 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:42:50,515 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:43:14,501 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:44:10,342 ERROR [scheduling-1] (ScheduleProductTask:139) 更新产品任务失败：
+### Error querying database.  Cause: com.mysql.cj.jdbc.exceptions.CommunicationsException: The last packet successfully received from the server was 55,798 milliseconds ago.  The last packet sent successfully to the server was 55,802 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+### The error may exist in file [G:\diskJ\javaProject\business\target\classes\mapper\WorkFlowOrderDao.xml]
+### The error may involve com.business.dao.WorkFlowOrderDao.selectProductList-Inline
+### The error occurred while setting parameters
+### SQL: select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,dataSelectType,productLevel,out_productdir,orderStatus,startTime,endTime,logName,logPath,resampleKernal,fileResource from workflow_order where orderStatus = ? and taskMode='PRTask'
+### Cause: com.mysql.cj.jdbc.exceptions.CommunicationsException: The last packet successfully received from the server was 55,798 milliseconds ago.  The last packet sent successfully to the server was 55,802 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+; The last packet successfully received from the server was 55,798 milliseconds ago.  The last packet sent successfully to the server was 55,802 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.; nested exception is com.mysql.cj.jdbc.exceptions.CommunicationsException: The last packet successfully received from the server was 55,798 milliseconds ago.  The last packet sent successfully to the server was 55,802 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+2021-01-22 16:44:25,281 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:44:28,282 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:45:04,940 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:45:07,465 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:45:43,540 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:45:45,517 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:45:47,884 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:45:52,554 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:48:06,748 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:48:07,596 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:48:07,662 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:48:07,662 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:48:29,375 INFO  [main] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 16:48:48,195 INFO  [scheduling-1] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 16:49:38,952 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:49:39,668 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:49:39,734 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:49:39,734 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:50:00,479 INFO  [main] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 16:55:56,467 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:55:57,651 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 16:55:57,707 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:55:57,707 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 16:56:04,697 INFO  [scheduling-1] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:05:02,954 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:05:03,714 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:05:03,773 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:05:03,774 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:05:06,132 INFO  [main] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:05:22,946 INFO  [scheduling-1] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:09:46,390 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:09:47,049 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:09:47,105 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:09:47,105 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:09:50,104 INFO  [main] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:13:53,563 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:13:54,377 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:13:54,432 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:13:54,432 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:13:58,405 INFO  [main] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:14:16,839 INFO  [main] (R0Meta:52) generating R0-meta file for : Z:\gfinterface\fromDTC_temp\202101\JOB202101150945000\GF07_01_004029_20210115_KR111_R0.dat
+2021-01-22 17:32:12,436 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:32:13,757 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:32:13,814 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:32:13,814 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:32:16,318 INFO  [main] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:32:18,353 INFO  [main] (R0Meta:52) generating R0-meta file for : Z:\gfinterface\fromDTC_temp\202101\JOB202101150945000\GF07_01_004029_20210115_KR111_R0.dat
+2021-01-22 17:35:03,776 INFO  [scheduling-1] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:35:04,843 INFO  [main] (ScheduleHoldTask:52) 发现任务DATask的任务号是DA20210121144023
+2021-01-22 17:35:04,905 INFO  [scheduling-1] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:35:04,905 INFO  [main] (ScheduleHoldTask:63) 开始处理归档任务DA20210121144023
+2021-01-22 17:35:20,540 INFO  [scheduling-1] (DataArchiveAction:55) 清理历史数据JOB202101150945000
+2021-01-22 17:35:22,353 INFO  [scheduling-1] (R0Meta:52) generating R0-meta file for : Z:\gfinterface\fromDTC_temp\202101\JOB202101150945000\GF07_01_004029_20210115_KR111_R0.dat
+2021-01-22 17:35:23,774 INFO  [scheduling-1] (R0Meta:80) generated R0-meta file : Z:\DataBank\GF07\SIGNAL\202101\20210115\GF07_01_004029_20210115_KR111_R0.meta.xml
+2021-01-22 17:35:23,775 INFO  [scheduling-1] (R0Meta:52) generating R0-meta file for : Z:\gfinterface\fromDTC_temp\202101\JOB202101150945000\GF07_02_004029_20210115_KR112_R0.dat
+2021-01-22 17:35:32,040 INFO  [scheduling-1] (R0Meta:80) generated R0-meta file : Z:\DataBank\GF07\SIGNAL\202101\20210115\GF07_02_004029_20210115_KR112_R0.meta.xml
+2021-01-22 17:36:08,559 INFO  [scheduling-1] (DataArchiveAction:129) partPath:-----202101/20210122/GF07_01_004029_20210115_KR111_R0_173604/
+2021-01-22 17:36:09,744 INFO  [scheduling-1] (DataArchiveAction:131) outputDir is :-------Z:\DataBank\GF07\202101\20210115\JOB202101150945000

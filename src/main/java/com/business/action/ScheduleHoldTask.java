@@ -4,6 +4,7 @@ import com.business.Service.WorkFlowOrderService;
 import com.business.config.Config;
 import com.business.entity.WorkflowOrder;
 import com.business.util.DateUtil;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -23,6 +24,7 @@ import java.util.List;
 @Configuration
 @EnableScheduling   //打开quartz定时器总开关
 public class ScheduleHoldTask {
+    private static final org.apache.log4j.Logger logger= Logger.getLogger(ScheduleHoldTask.class);
     @Autowired
     private WorkFlowOrderService orderService;
     @Resource
@@ -41,24 +43,29 @@ public class ScheduleHoldTask {
         if (runList.size()<size){
             size = size-runList.size();
             List<WorkflowOrder>holdList = orderService.selectList("1");
+
             if (holdList.size()!=0){
                 //todo 小心越界
                 if (size>holdList.size())size=holdList.size();
                 for (int i=0;i<size;i++){
                     WorkflowOrder order = holdList.get(i);
+                    logger.info("发现任务"+order.getTaskMode()+"的任务号是"+order.getTaskSerialNumber());
                     String orderType = order.getOrderType().split("_")[0];
                     order.setOrderStatus("2");
                     switch (orderType){
                         case "QATask":
                             orderService.updateById(order);
+                            logger.info("开始处理QA任务"+order.getTaskSerialNumber());
                             qaTaskAction.process(order);
                             break;
                         case "DATask":
                             orderService.updateById(order);
+                            logger.info("开始处理归档任务"+order.getTaskSerialNumber());
                             processDATask(order);
                             break;
                         case "PRTask":
                             orderService.updateById(order);
+                            logger.info("开始处理产品任务"+order.getTaskSerialNumber());
                             prTaskAction.doTriggerQATask(order);
                             break;
                     }
@@ -77,7 +84,8 @@ public class ScheduleHoldTask {
                         result = true;
                         break;
                     case "ondisk":
-                        File receiver_Dir2 = new File(Config.local_dir +"/"+t.getJobTaskID());
+                        String local_dir = Config.local_dir+"\\"+DateUtil.getSdfMonths();
+                        File receiver_Dir2 = new File( local_dir+"/"+t.getJobTaskID());
                         dataArchiveAction.processDataArchive(receiver_Dir2,t);
                         result = true;
                         break;

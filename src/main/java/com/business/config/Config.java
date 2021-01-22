@@ -37,7 +37,6 @@ public class Config {
     public static String node_username;
     public static String node_password;
     public static String toOMO_author;
-    public static String dpps_dir;
 
     public static File archive_root;
     public static File archive_unzip;
@@ -68,7 +67,6 @@ public class Config {
                 //skip
             }
         }
-        dpps_dir = loadStringKey("dpps_dir");
 
         redisIp = loadStringKey("redisIp");
         redisPort = loadIntKey("redisPort");

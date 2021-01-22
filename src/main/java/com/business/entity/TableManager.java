@@ -6,8 +6,17 @@ package com.business.entity;
  * Created by w_kiven on 2020/12/3 16:22
  */
 public class TableManager {
+    public String tablename;
     public String jobtaskid;
     public String taskid;
+
+    public String getTablename() {
+        return tablename;
+    }
+
+    public void setTablename(String tablename) {
+        this.tablename = tablename;
+    }
 
     public String getJobtaskid() {
         return jobtaskid;

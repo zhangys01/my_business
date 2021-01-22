@@ -14,15 +14,15 @@ public interface NomalManagerService extends IService<TableManager> {
     /**
      * 根据JobTaskId删除信息
      */
-    void deleteByJobtaskId(String tableName,String jobtaskId);
+    void deleteByJobtaskId(String tablename,String jobtaskid);
     /**
      * 删除L1表内的数据
      */
-    void deleteProductIdByL1A(String tableName,String PRODUCTID_L1A);
+    void deleteProductIdByL1A(String tablename,String PRODUCTID_L1A);
     /**
      * 删除L2表内的数据信息
      */
-    void deleteProductIdByL2A(String tableName,String PRODUCTID_L2A);
+    void deleteProductIdByL2A(String tablename,String PRODUCTID_L2A);
 
     Ml2Info getL2AInfo(String jobtaskid,String scenid);
 

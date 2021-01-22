@@ -16,18 +16,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class NomalManagerServiceImpl extends ServiceImpl<NomalManagerDao, TableManager> implements NomalManagerService {
     @Override
-    public void deleteByJobtaskId(String tableName,String jobtaskId) {
-        baseMapper.deleteByJobtaskId(tableName,jobtaskId);
+    public void deleteByJobtaskId(String tablename,String jobtaskid) {
+        baseMapper.deleteByJobtaskId(tablename,jobtaskid);
     }
 
     @Override
-    public  void  deleteProductIdByL1A(String tableName,String PRODUCTID_L1A){
-        baseMapper.deleteProductIdByL1A(tableName,PRODUCTID_L1A);
+    public  void  deleteProductIdByL1A(String tablename,String PRODUCTID_L1A){
+        baseMapper.deleteProductIdByL1A(tablename,PRODUCTID_L1A);
     }
 
     @Override
-    public void deleteProductIdByL2A(String tableName,String PRODUCTID_L2A){
-        baseMapper.deleteProductIdByL2A(tableName,PRODUCTID_L2A);
+    public void deleteProductIdByL2A(String tablename,String PRODUCTID_L2A){
+        baseMapper.deleteProductIdByL2A(tablename,PRODUCTID_L2A);
     }
 
     @Override
