@@ -1,5 +1,8 @@
 package com.business.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +17,8 @@ import java.util.Properties;
  * Time: 下午12:32
  * To change this template use File | Settings | File Templates.
  */
+@Component
+//@ConfigurationProperties(prefix = "person")
 public class Config {
     private static Properties p = new Properties();
 
@@ -50,7 +55,8 @@ public class Config {
 
     //注意，必须先调用此方法加载配置！
     public static void loadConfig() throws Exception {
-        InputStream in=ClassLoader.getSystemResourceAsStream("application.properties");
+        //InputStream in=ClassLoader.getSystemResourceAsStream("application.properties");
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
         if(in==null) throw new IOException("application.properties not found!");
         p = new Properties();
         try{

@@ -12,7 +12,8 @@
     <artifactId>business</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>business</name>
-    <description>Demo project for Spring Boot</description>
+    <packaging>jar</packaging>
+    <description>satelliteQuality project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -62,11 +63,11 @@
             <version>2.0.5.RELEASE</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
             <version>2.7.7</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
@@ -74,17 +75,22 @@
         </dependency>
         <dependency>
             <groupId>eclipselink</groupId>
-            <artifactId>org.eclipse.persistence.oxm.annotations.XmlPath</artifactId>
+            <artifactId>eclipselink</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/eclipselink.jar</systemPath>
         </dependency>
-        <dependency>
+      <!--  <dependency>
             <groupId>ganymed-ssh2-build210</groupId>
-            <artifactId>ch.ethz.ssh2.</artifactId>
+            <artifactId>ch.ethz.ssh2</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/ganymed-ssh2-build210.jar</systemPath>
+        </dependency>-->
+        <dependency>
+            <groupId>ch.ethz.ganymed</groupId>
+            <artifactId>ganymed-ssh2</artifactId>
+            <version>build210</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

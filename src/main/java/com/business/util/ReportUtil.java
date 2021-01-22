@@ -36,15 +36,14 @@ import java.util.zip.ZipOutputStream;
 @Component
 public class ReportUtil {
     private static final Logger logger = Logger.getLogger(ReportUtil.class);
-
     @Autowired
     private WorkFlowOrderService orderService;
     @Autowired
     private ProcessInfoService processInfoService;
     @Autowired
     private WorkFlowDataArchiveService workFlowDataArchiveService;
-    @Autowired
-    private SysDictionariesService dictionariesService;
+   /* @Autowired
+    private SysDictionariesService dictionariesService;*/
     @Autowired
     private Ml0InfoService ml0InfoService;
     @Resource
