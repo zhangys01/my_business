@@ -1,5 +1,7 @@
 package com.business.util;
 
+import com.business.config.Config;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -19,6 +21,9 @@ import java.util.regex.Pattern;
  */
 public enum UnzipParaTemplate {   //解压缩相关参数文件模板
     TASK_BASE_FILE("125_UNZIP.xml"),
+    TASK_SYNC_FILE("GF06_UNZIP_SYNC.xml"),
+    GF6_UNZIP_FILE("GF_UNZIP.xml"),
+    GF7_UNZIP_FILE("GF7_UNZIP.xml"),
     Task_UNZIP("dan_125_UNZIP.xml");
     private String templateFileName;
 
@@ -42,10 +47,12 @@ public enum UnzipParaTemplate {   //解压缩相关参数文件模板
      */
     public String generateParaString(Map<String,Object> params) throws Exception {
         //每次都加载模板文件，这样可支持实时更新模板文件而无需重启。
-        URL url=ClassLoader.getSystemResource(templateFileName);
-        if(url==null) throw new IOException("template file not found: "+templateFileName);
+       /* URL url=ClassLoader.getSystemResource(templateFileName);
+        if(url==null) throw new IOException("template file not found: "+templateFileName);*/
+        File file = new File(Config.process_template+"/"+templateFileName);
+        if (!file.exists()) throw new IOException("order template file not found: " + templateFileName);
         //todo 模板文件必须规定为UTF-8编码
-        String str=new String(Files.readAllBytes(new File(url.getPath()).toPath()),"UTF-8");
+        String str=new String(Files.readAllBytes(new File(file.getPath()).toPath()),"UTF-8");
 
         //先查找所有%key%模式，提取所有key
         final Pattern p = Pattern.compile("%(\\w+)%");

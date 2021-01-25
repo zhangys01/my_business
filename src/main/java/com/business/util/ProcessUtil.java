@@ -38,14 +38,11 @@ public class ProcessUtil {
         //todo 即使订单不规范、或其它后台错误，ws服务端都不会抛异常，所以并不能认为流程一定创建成功。
         //可通过查询数据库来确认！有一定延迟，需等待片刻！
         long waitTotal = 0;  //秒
-        //TODO 先休眠五秒，再查询数据库
-        //Thread.sleep(5000);
         do {
             ProcessInfo info = processInfoService.getById(orderId);
             if (info!=null) {
                logger.info("生成流程"+orderId);
             }
-            Thread.sleep(5000);
             waitTotal+=5;
         } while (waitTotal < waitTimeout);
         throw new Exception("jbpm order record not found: " + orderId);

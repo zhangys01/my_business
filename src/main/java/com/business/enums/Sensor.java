@@ -25,6 +25,17 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
     public static List<String> fromOMOSensor(String satellite) {
         List<String>sensorList = new ArrayList<>();
         switch (satellite){
+            case"GF-6":
+                sensorList.add("WF");
+                sensorList.add("PAN");
+                sensorList.add("MSS");
+                break;
+            case "GF-7":
+                sensorList.add("NAD");
+                sensorList.add("FWD");
+                sensorList.add("BWD");
+                sensorList.add("MSS");
+                break;
             case"GF-1B":
             case"GF-1C":
             case"GF-1D":

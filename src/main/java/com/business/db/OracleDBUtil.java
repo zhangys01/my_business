@@ -22,7 +22,7 @@ public class OracleDBUtil {
     static {
         try {
             Properties properties = new Properties();
-            properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties"));
+            properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application_windows.properties"));
             dataSource = new DruidDataSource();
             //四个基本属性
             dataSource.setDriverClassName(properties.getProperty("oracle_driver"));

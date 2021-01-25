@@ -24,7 +24,7 @@ import java.util.List;
 @Configuration
 @EnableScheduling   //打开quartz定时器总开关
 public class ScheduleHoldTask {
-    private static final org.apache.log4j.Logger logger= Logger.getLogger(ScheduleHoldTask.class);
+    private static final Logger logger= Logger.getLogger(ScheduleHoldTask.class);
     @Autowired
     private WorkFlowOrderService orderService;
     @Resource
@@ -77,6 +77,7 @@ public class ScheduleHoldTask {
             boolean result = false;
             try{
                 //todo 三种情况
+                logger.info("当前归档任务路径为:"+t.getFileResource());
                 switch (t.getFileResource()){
                     case "onfilepath":
                         File receiver_Dir1 = new File(t.getJobTaskID());
@@ -84,7 +85,9 @@ public class ScheduleHoldTask {
                         result = true;
                         break;
                     case "ondisk":
-                        String local_dir = Config.local_dir+"\\"+DateUtil.getSdfMonths();
+
+                        String local_dir = Config.local_dir+"/"+DateUtil.getSdfMonths();
+                        logger.info("local_dir is "+local_dir);
                         File receiver_Dir2 = new File( local_dir+"/"+t.getJobTaskID());
                         dataArchiveAction.processDataArchive(receiver_Dir2,t);
                         result = true;

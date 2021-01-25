@@ -1,6 +1,5 @@
 package com.business.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -37,6 +36,7 @@ public class Config {
     public static String node_username;
     public static String node_password;
     public static String toOMO_author;
+    public static String data_absolute_dir;
 
     public static File archive_root;
     public static File archive_unzip;
@@ -54,7 +54,7 @@ public class Config {
 
     //注意，必须先调用此方法加载配置！
     public static void loadConfig() throws Exception {
-        //InputStream in=ClassLoader.getSystemResourceAsStream("application.properties");
+        //InputStream in=ClassLoader.getSystemResourceAsStream("application_windows.properties");
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
         if(in==null) throw new IOException("application.properties not found!");
         p = new Properties();
@@ -102,6 +102,7 @@ public class Config {
 
         move_number = loadIntKey("move_number");
         running_number = loadIntKey("running_number");
+        data_absolute_dir = loadStringKey("data_absolute_dir");
     }
 
     private static String loadStringKey(String key) throws Exception {

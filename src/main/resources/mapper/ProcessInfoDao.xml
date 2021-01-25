@@ -7,10 +7,10 @@
     </select>
 
     <select id="getProcessByName" parameterType="String" resultType="com.business.entity.ProcessInfo">
-        select processId,orderId,platform,status from pd_processinfo where  platform= #{0} and processType = #{1} order by status limit 1
+        select processId,orderId,platform,status from pd_processinfo where  platform= #{platfrom} and processType = #{processType} order by status limit 1
     </select>
 
     <select id="getProcessList" parameterType="String" resultType="com.business.entity.ProcessInfo">
-        select processId,orderId,platform,status from pd_processinfo where  platform= #{0} and processType = #{1} order by createTime
+        select processId,orderId,platform,status from pd_processinfo where  platform= #{platfrom} and processType = #{processType} order by createTime
     </select>
 </mapper>

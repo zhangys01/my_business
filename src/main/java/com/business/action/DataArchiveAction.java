@@ -1,7 +1,6 @@
 package com.business.action;
 
 import com.business.Service.NomalManagerService;
-import com.business.Service.ProcessInfoService;
 import com.business.Service.UnzipConfigService;
 import com.business.Service.UnzipConfirmService;
 import com.business.config.Config;
@@ -28,7 +27,7 @@ import java.util.*;
  */
 @Component
 public class DataArchiveAction {
-    private static final Logger logger = Logger.getLogger(DataArchiveAction.class);
+    private static final Logger logger= Logger.getLogger(DataArchiveAction.class);
     @Autowired
     private NomalManagerService nomalManagerService;
     @Autowired
@@ -41,6 +40,8 @@ public class DataArchiveAction {
     private ProcessUtil processUtil;
 
     public void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
+
+        logger.info("进入归档处理步骤，开始处理归档流程");
         File[] datFiles = dataTmpDir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -78,6 +79,7 @@ public class DataArchiveAction {
         Date time=new Date();//统一用一个任务创建时间
         //TODO 根据卫星分不同的Ro_to_L0
         List<ProcessInfo>dataInfoList = new ArrayList<>();
+        logger.info("当前卫星名称为："+t.getSatelliteName());
         //switch (reportUtil.findBianma(t.getSatelliteName())){
         switch (t.getSatelliteName()){
             //todo GF1BCD
@@ -112,8 +114,6 @@ public class DataArchiveAction {
         //提交订单。注意，先提交解压缩流程（因为解压缩流程占用资源多，先提交可能会让其先占用到资源）
         //todo 建一个线程，查processInfo表
         processUtil.submitProcess(unzipOrderXml, Config.submit_order_timeout);
-        //TODO 启动检查线程
-        Thread.sleep(25000);
     }
     private Map<String,Object> generateOrderParamsForGF_R0_TO_L0(File R0Meta1, File R0Meta2, WorkflowOrder t, Satellite satellite, String jobTaskId, File S1File, File S2File) throws Exception {
         //先尝试生成解压缩相关参数文件
@@ -135,13 +135,41 @@ public class DataArchiveAction {
         UnzipConfirm unzipConfirm = new UnzipConfirm();
         //再生成工作流订单参数
         Map<String,Object> map=new HashMap<>();
-
-        //todo  生成通道1的解压缩xml
-        unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,DateUtil.getSdfDate(),signalId,partPath);
-        unzipConfirm.setStatus(0);
-        unzipConfirm.setTaskId(t.getTaskSerialNumber());
-        unzipConfirmService.save(unzipConfirm);
-        map.put("TASKBASEFILE1",unzipConfirm.getActivityId());
+        switch (t.getSatelliteName()){
+            case"GF-6":
+                Map<String,Object>unzipMap = new HashMap<>();
+                Map<String,Object>syncMap =new HashMap<>();
+                File SyncFile1 =null,SyncFile2 = null;
+                // todo 生成高分6的帧同步订单
+                if (S1File!=null){
+                    syncMap = generateSyncParaFile(S1File,"S1",t,jobTaskId,partPath);
+                    map.put("TASKSYNCFILE1",syncMap.get("TASKSYNCFILE1"));
+                    SyncFile1 = new File(syncMap.get("OUT_DIR").toString());
+                }
+                if (S2File!=null){
+                    syncMap = generateSyncParaFile(S2File,"S2",t,jobTaskId,partPath);
+                    map.put("TASKSYNCFILE2",syncMap.get("TASKSYNCFILE2"));
+                    SyncFile2 = new File(syncMap.get("OUT_DIR").toString());
+                }
+                map.put("SYNC_OUTPUTDIR",syncMap.get("SYNC_OUTPUTDIR"));
+                unzipMap = generateGfUnzipParaFile(SyncFile1,"1",null,null,t,jobTaskId,signalId,partPath);
+                map.put("TASKBASEFILE1",unzipMap.get("TASKBASEFILE1"));
+                unzipMap = generateGfUnzipParaFile(SyncFile2,"2",null,null,t,jobTaskId,signalId,partPath);
+                map.put("TASKBASEFILE2",unzipMap.get("TASKBASEFILE2"));
+                break;
+            case "GF-7":
+                unzipMap = generateGfUnzipParaFile(S1File,"1",S2File,"2",t,jobTaskId,signalId,partPath);
+                map.put("TASKBASEFILE1",unzipMap.get("TASKBASEFILE1"));
+                break;
+            default:
+                //todo  生成通道1的解压缩xml
+                unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,DateUtil.getSdfDate(),signalId,partPath);
+                unzipConfirm.setStatus(0);
+                unzipConfirm.setTaskId(t.getTaskSerialNumber());
+                unzipConfirmService.save(unzipConfirm);
+                map.put("TASKBASEFILE1",unzipConfirm.getActivityId());
+                break;
+        }
         map.put("S1META",R0Meta1);
         map.put("SIGNALID1",S1File==null?null:S1File.getName().replace(".dat",""));
         map.put("S2META",R0Meta2);
@@ -151,6 +179,109 @@ public class DataArchiveAction {
         map.put("JOBTASKID",jobTaskId);
         map.put("OUTPUTDIR",outputDir);
         map.put("TASKSERIALNUMBER",t.getTaskSerialNumber());
+        return map;
+    }
+    private Map<String,Object> generateSyncParaFile(File dat,String chanel,WorkflowOrder t,String jobTaskId,String pPath) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        String[] items = dat.getName().split("_");
+        String syncId = t.getSatelliteName().replace("-","0")+"_UNZIP_SYNC_" + DateUtil.getDays()+ "_"+items[2]+"_"+chanel;
+        try {
+            map.put("SYNCID", syncId);
+            map.put("JOBTASKID", jobTaskId);
+            map.put("STATION", items[4].substring(0, 2));
+            map.put("SIGNALID", dat==null?null:dat.getName().replace(".dat",""));
+            map.put("SIGNALFILE", dat);
+            map.put("SATELLITENAME",t.getSatelliteName());
+            //todo 输出数据到SIGNAL里面吧L0DATA
+            File outDir = new File(Config.dataBank_dir+ "/"+items[0]+ "/SIGNAL/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId);
+            if (outDir.exists()&&outDir.isDirectory()){
+                MyHelper.emptyDir(outDir);
+            }
+            if (!outDir.exists()&&!outDir.isDirectory()){
+                Files.createDirectories(outDir.toPath());
+            }
+            String name = map.get("SIGNALID").toString()+"_sync.dat";
+            map.put("OUT_DIR",outDir.toString()+"/"+name);
+            if(chanel.equals("S1")){
+                map.put("MODE", "CH1");
+                map.put("SOCKPORT", "20000");
+            } else {
+                map.put("MODE", "CH2");
+                map.put("SOCKPORT", "20001");
+            }
+            UnzipParaTemplate template=UnzipParaTemplate.TASK_SYNC_FILE;
+            String str=template.generateParaString(map);
+            File f=new File(Config.unzip_bak_dir, pPath + syncId+".param.xml");
+            Files.createDirectories(f.getParentFile().toPath());  //必须先尝试创建各级目录
+            Files.write(f.toPath(),str.getBytes("UTF-8"));        //参数文件必须规定为UTF-8编码
+            if (chanel.equals("S1")){
+                map.put("TASKSYNCFILE1",f.toString());
+            }else if (chanel.equals("S2")){
+                map.put("TASKSYNCFILE2",f.toString());
+            }
+            map.put("SYNC_OUTPUTDIR",Config.dataBank_dir+ "/"+items[0]+ "/SIGNAL/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId);
+        }catch (Exception e){
+            logger.info(e);
+        }
+        return map;
+    }
+    /*
+    *todo 高分三期的解压缩调度程序
+    */
+    private Map<String,Object> generateGfUnzipParaFile(File dat,String chanel,File dat2,String chanel2,WorkflowOrder t,String jobTaskId,String signalId,String pPath) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        map.put("JOBTASKID",t.getJobTaskID());
+        String[] items = signalId.split("_");
+        File l0DataDir=null,dir=null;
+        List<String>sensorList1 = Sensor.fromOMOSensor(t.getSatelliteName());
+        if (t.getSatelliteName().equals("GF-6")){
+            for (int i=0;i<sensorList1.size();i++){
+                l0DataDir = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/"+sensorList1.get(i)));
+                dir = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
+                MyHelper.CreateDirectory(dir);
+                int j = i+1;
+                map.put("OUTPUTDIR"+j, l0DataDir);
+            }
+        }else if (t.getSatelliteName().equals("GF-7")){
+            l0DataDir = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/"));
+            dir = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/"));
+            MyHelper.CreateDirectory(dir);
+            map.put("OUTPUTDIR1", l0DataDir);
+        }
+        if (t.getSatelliteName().equals("GF-7")){
+            //todo 检查原始数据是1024帧长还是896帧长
+            String VCModel = R0Meta.checkMode(dat);
+            map.put("VCMMODE",VCModel);
+            map.put("SYNCPARAFILE1",dat.toString());
+            map.put("SYNCPARAFILE2",dat2.toString());
+
+        } else if (t.getSatelliteName().equals("GF-6")){
+            String datName = dat.toString().replace(Config.data_absolute_dir,Config.data_absolute_dir);
+            if (chanel.equals("1")){
+                map.put("SIGNALID1",datName);
+            }
+            if(chanel.equals("2")){
+                map.put("SIGNALID2",datName);
+            }
+        }
+        map.put("SATELLITE",items[0]);
+        map.put("YYYYMMDD_XXXXXX",DateUtil.getSdfDate());
+        UnzipParaTemplate template = null;
+        if (t.getSatelliteName().equals("GF-6")){
+            template=UnzipParaTemplate.GF6_UNZIP_FILE;
+        }else if (t.getSatelliteName().equals("GF-7")){
+            template=UnzipParaTemplate.GF7_UNZIP_FILE;
+        }
+        String str=template.generateParaString(map);
+        File f=new File(Config.unzip_bak_dir, pPath + "UNZIP_BASE_"+map.get("YYYYMMDD_XXXXXX")+"_"+items[0]+"_"+items[2]+"_"+chanel+".param.xml");
+        Files.createDirectories(f.getParentFile().toPath());  //必须先尝试创建各级目录
+        Files.write(f.toPath(),str.getBytes("UTF-8"));        //参数文件必须规定为UTF-8编码
+        if (chanel.equals("1")){
+            map.put("TASKBASEFILE1",f.toString());
+        }
+        if (chanel.equals("2")){
+            map.put("TASKBASEFILE2",f.toString());
+        }
         return map;
     }
     private UnzipConfirm generateBaseParaFile(File dat1,String chanel1,File dat2,String chanel2,WorkflowOrder t,String jobTaskId,String orderidSuffix,String signalId,String pPath) throws Exception {
@@ -186,6 +317,7 @@ public class DataArchiveAction {
         map.put("ORBITID", items[2]);
         map.put("SENSORLIST",unzip.getSensorList());
 
+        logger.info("任务的优先级为"+t.getTaskPriority());
         //todo  2019/10/30 新增解压缩优先级
         switch (t.getTaskPriority()){
             case "normal":

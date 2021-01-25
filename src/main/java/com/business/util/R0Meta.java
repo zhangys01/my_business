@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,32 +25,6 @@ public class R0Meta {
     private static final Logger logger = Logger.getLogger(R0Meta.class);
     private static LogUtil logUtil;
     public static File generateR0Meta(WorkflowOrder order, String jobTaskId, File signalFile) throws Exception {
-        //从原始码流文件提取元信息，生成原始码流元数据文件，放在同一目录下。
-        /**
-         *  原始码流文件命名规范为：
-         *  4位卫星简称_2位通道号_6位轨道号_8位接收日期(YYYYMMDD)_5位计划序号_R0.dat   (计划序号为：2位接收站号＋1位天线号＋1位记录器号＋1位通道号)
-         *  例如：GF01_01_008694_20130201_SY123_R0.dat
-         *
-         *  除去扩展名即为：SIGNALID
-         *  例如：GF01_01_008694_20130201_SY123_R0
-         *
-         *  原始码流元数据文件格式：
-         *  <?xml version='1.0' encoding='UTF-8'?>
-         *  <S0Meta>
-         *    <TaskID>JOB201306150000001</TaskID>                    作业任务编号
-         *    <SignalID>GF01_01_008694_20130201_SY123_R0</SignalID>  即数据文件名（去掉.dat）
-         *    <SatelliteID>GF01</SatelliteID>            卫星简称
-         *    <ChannelID>S1</ChannelID>                  通道（S1、S2）
-         *    <OrbitNumber>7960</OrbitNumber>            轨道号（数值型）
-         *    <StationID>MY</StationID>                  接收站
-         *    <AntennaID>4</AntennaID>                   天线编号
-         *    <RecorderID>3</RecorderID>                 记录器编号
-         *    <RecorderChannelID>0</RecorderChannelID>   记录器通道编号
-         *    <FileSize>27888975872</FileSize>           文件大小(B)
-         *    <ReceiveStartTime>2013-06-15 02:00:27</ReceiveStartTime>   接收起始时间
-         *    <ReceiveEndTime>2013-06-15 02:11:39</ReceiveEndTime>       接收结束时间
-         *  </S0Meta>
-         */
         logger.info("generating R0-meta file for : " + signalFile);
         String signalId = signalFile.getName().replace(".dat", "");
         String[] items = signalFile.getName().split("_");
@@ -116,5 +92,77 @@ public class R0Meta {
             logger.info("从原始数据解析时间错误："+e);
         }
         return  ret;
+    }
+    public static String checkMode( File file) throws IOException {
+        String VCModel = "";
+        InputStream is = new FileInputStream(file);
+        is.skip(4194304);
+        int bytesCounter =0;
+        int value = 0;
+        StringBuilder sbHex = new StringBuilder();
+        StringBuilder sbText = new StringBuilder();
+        StringBuilder sbResult = new StringBuilder();
+        //todo 查询是否是一样
+        StringBuilder sbHex1 = new StringBuilder();
+        StringBuilder sbText1 = new StringBuilder();
+        StringBuilder sbResult1 = new StringBuilder();
+
+        while ((value = is.read()) != -1) {
+            sbHex.append(String.format("%02X ", value));
+            if (!Character.isISOControl(value)) {
+                sbText.append((char)value);
+            }else {
+                sbText.append(".");
+            }
+
+            //if 16 bytes are read, reset the counter,
+            //clear the StringBuilder for formatting purpose only.
+            if(bytesCounter==15){
+                sbResult.append(sbHex).append("      ").append(sbText).append("\n");
+                sbHex.setLength(0);
+                sbText.setLength(0);
+                bytesCounter=0;
+            }else{
+                bytesCounter++;
+            }
+            String syncCode = sbHex.toString();
+            //todo 找到头之后跳过1020字节，如果还是同步码，那就不是VCM
+            if(syncCode.equals("1A CF FC 1D ")){
+                is.skip(4195324);
+                int i =0 ;
+                while ((value = is.read()) != -1) {
+                    i++;
+                    sbHex1.append(String.format("%02X ", value));
+                    if (!Character.isISOControl(value)) {
+                        sbText1.append((char)value);
+                    }else {
+                        sbText1.append(".");
+                    }
+                    if(bytesCounter==15){
+                        sbResult1.append(sbHex1).append("      ").append(sbText1).append("\n");
+                        sbHex1.setLength(0);
+                        sbText1.setLength(0);
+                        bytesCounter=0;
+                    }else{
+                        bytesCounter++;
+                    }
+                    String syncCode1 = sbHex1.toString();
+                    if (i==4){
+                        if (syncCode1.equals("1A CF FC 1D ")){
+                            VCModel = "0";
+                            break;
+                        }else {
+                            VCModel = "1";
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!"".equals(VCModel)){
+                break;
+            }
+
+        }
+        return VCModel;
     }
 }
