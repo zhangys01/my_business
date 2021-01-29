@@ -9,5 +9,6 @@ import com.business.entity.UnzipConfirm;
  * Created by w_kiven on 2020/12/4 15:18
  */
 public interface UnzipConfirmService extends IService<UnzipConfirm> {
-
+        void saveConfrim(int id,String activitId,String cancelId,int status);
+        int selectMaxId();
 }

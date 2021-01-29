@@ -1,6 +1,7 @@
 package com.business.action;
 
 import com.business.Service.NomalManagerService;
+import com.business.Service.ProcessInfoService;
 import com.business.Service.UnzipConfigService;
 import com.business.Service.UnzipConfirmService;
 import com.business.config.Config;
@@ -34,8 +35,8 @@ public class DataArchiveAction {
     private UnzipConfirmService unzipConfirmService;
     @Autowired
     private UnzipConfigService unzipConfigService;
-  /*  @Autowired
-    private ProcessInfoService processInfoService;*/
+    @Autowired
+    private ProcessInfoService processInfoService;
     @Resource
     private ProcessUtil processUtil;
 
@@ -79,41 +80,60 @@ public class DataArchiveAction {
         Date time=new Date();//统一用一个任务创建时间
         //TODO 根据卫星分不同的Ro_to_L0
         List<ProcessInfo>dataInfoList = new ArrayList<>();
-        logger.info("当前卫星名称为："+t.getSatelliteName());
         //switch (reportUtil.findBianma(t.getSatelliteName())){
         switch (t.getSatelliteName()){
             //todo GF1BCD
             case"GF-1B":
             case"GF-1C":
             case"GF-1D":
-                unzipOrderXml = ProcessType.GF1_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"GF1_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.GF1_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
                 break;
                 //todo ZY1E cbers04A
             case"ZY-1E":
-               /* dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"ZY1E_R0_TO_L0");
-                if(dataInfoList.size()==0) {*/
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"ZY1E_R0_TO_L0");
+                if(dataInfoList.size()==0) {
                     unzipOrderXml = ProcessType.ZY1E_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
-              //  }
+                }
                 break;
             case "CBERS04A":
-                unzipOrderXml = ProcessType.CB4A_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"CB4A_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.CB4A_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
                 break;
             case"CASEARTH":
-                unzipOrderXml = ProcessType.CAS_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"CAS_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.CAS_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
                 break;
             case"ZY-3B":
-                unzipOrderXml = ProcessType.ZY3_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"ZY3_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.ZY3_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
                 break;
             case"GF-6":
-                unzipOrderXml = ProcessType.GF6_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"GF6_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.GF6_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
                 break;
             case"GF-7":
-                unzipOrderXml = ProcessType.GF7_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1,RoMeta2,t,satellite,jobTaskId,S1File,S2File));
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"GF7_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.GF7_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
                 break;
         }
         //提交订单。注意，先提交解压缩流程（因为解压缩流程占用资源多，先提交可能会让其先占用到资源）
         //todo 建一个线程，查processInfo表
-        processUtil.submitProcess(unzipOrderXml, Config.submit_order_timeout);
+        if (unzipOrderXml!=null){
+            processUtil.submitProcess(unzipOrderXml, Config.submit_order_timeout);
+        }
     }
     private Map<String,Object> generateOrderParamsForGF_R0_TO_L0(File R0Meta1, File R0Meta2, WorkflowOrder t, Satellite satellite, String jobTaskId, File S1File, File S2File) throws Exception {
         //先尝试生成解压缩相关参数文件
@@ -166,7 +186,9 @@ public class DataArchiveAction {
                 unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,DateUtil.getSdfDate(),signalId,partPath);
                 unzipConfirm.setStatus(0);
                 unzipConfirm.setTaskId(t.getTaskSerialNumber());
-                unzipConfirmService.save(unzipConfirm);
+                int unzipId = unzipConfirmService.selectMaxId();
+                unzipConfirm.setId(unzipId);
+                unzipConfirmService.saveConfrim(unzipConfirm.getId(),unzipConfirm.getActivityId(),unzipConfirm.getCancelActivityId(),unzipConfirm.getStatus());
                 map.put("TASKBASEFILE1",unzipConfirm.getActivityId());
                 break;
         }
@@ -308,7 +330,6 @@ public class DataArchiveAction {
         srv = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/srv"));
         srvFile = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/srv"));
         MyHelper.CreateDirectory(srvFile);
-
         map.put("CRATETIME",DateUtil.getTime());
         map.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
         map.put("ACTIVITYTYPE","NEW");

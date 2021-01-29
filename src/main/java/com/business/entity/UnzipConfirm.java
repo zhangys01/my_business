@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.omg.CORBA.IDLType;
 
 /**
  * 1 *
@@ -14,7 +15,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName(value = "unzip_confirm")
 public class UnzipConfirm {
     @TableId(value = "ID",type = IdType.AUTO)
-    private int ID;
+    private int id;
     @TableField(value = "taskId")
     private String taskId;
     @TableField(value = "activityId")
@@ -24,12 +25,12 @@ public class UnzipConfirm {
     @TableField(value = "status")
     private int status;//0-未执行，1-被取消，2-完成
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTaskId() {

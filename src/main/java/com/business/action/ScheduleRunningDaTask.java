@@ -30,14 +30,14 @@ public class ScheduleRunningDaTask {
     private ReportUtil reportUtil;
 
     //添加定时任务
-    @Scheduled(cron = "0/3 * * * * ?")   //第0秒钟触发，每5秒中触发一次
+    @Scheduled(cron = "0/4 * * * * ?")   //第0秒钟触发，每5秒中触发一次
     public void configureTasks() throws Exception {
         try {
             System.out.println(DateUtil.getTime()+"开始查询归档任务");
-            List<WorkflowOrder> productList = new ArrayList<>();
-            productList = orderService.selectDataskList("2");
-            if (productList.size()!=0){
-                WorkflowOrder order = productList.get(0);
+            List<WorkflowOrder> daTaskList = new ArrayList<>();
+            daTaskList = orderService.selectDataskList("2");
+            if (daTaskList.size()!=0){
+                WorkflowOrder order = daTaskList.get(0);
                 order.setEndTime(DateUtil.getTime());
                 String satelliteName = "";
                 switch (order.getSatelliteName()) {
@@ -51,13 +51,14 @@ public class ScheduleRunningDaTask {
                         satelliteName = order.getSatelliteName();
                         break;
                     case "ZY-3B":
-                        satelliteName = order.getSatelliteName().replace("-","");
+                        satelliteName = "ZY3";
                         break;
                 }
                 String status2 = "";
-                List<ProcessInfo> casearthL0InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_R0_TO_L0");
-                if (casearthL0InfoList.size() != 0) {
-                    status2 = reportUtil.getProcessStatus(casearthL0InfoList, order);
+                List<ProcessInfo> L0InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_R0_TO_L0");
+                logger.info(L0InfoList+"这是归档的L0");
+                if (L0InfoList.size()!= 0) {
+                    status2 = reportUtil.getProcessStatus(L0InfoList, order);
                 }
                 if (status2.equals("success")) {
                     List<ProcessInfo> infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_L0_TO_CAT");

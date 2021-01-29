@@ -35,40 +35,53 @@ public class ScheduleHoldTask {
     PRtaskAction prTaskAction;
     //3.添加定时任务
 
-    @Scheduled(cron = "0/1 * * * * ? ")   //第0秒钟触发，每5秒中触发一次
+    @Scheduled(cron = "0/4 * * * * ? ")   //第0秒钟触发，每5秒中触发一次
     public void configureTasks()throws Exception{
         System.out.println(DateUtil.getTime()+"开始获取等待状态任务");
         List<WorkflowOrder>runList = orderService.selectList("2");
         int size = Config.running_number;
         if (runList.size()<size){
             size = size-runList.size();
+            List<WorkflowOrder>emergencyList = orderService.selectList("8");
+            if (emergencyList!=null&&emergencyList.size()!=0){
+                readyTask(emergencyList,"8",size);
+            }
             List<WorkflowOrder>holdList = orderService.selectList("1");
+            if (holdList!=null&&holdList.size()!=0){
+                readyTask(holdList,"1",size);
+            }
 
-            if (holdList.size()!=0){
-                //todo 小心越界
-                if (size>holdList.size())size=holdList.size();
-                for (int i=0;i<size;i++){
-                    WorkflowOrder order = holdList.get(i);
-                    logger.info("发现任务"+order.getTaskMode()+"的任务号是"+order.getTaskSerialNumber());
-                    String orderType = order.getOrderType().split("_")[0];
-                    order.setOrderStatus("2");
-                    switch (orderType){
-                        case "QATask":
-                            orderService.updateById(order);
-                            logger.info("开始处理QA任务"+order.getTaskSerialNumber());
-                            qaTaskAction.process(order);
-                            break;
-                        case "DATask":
-                            orderService.updateById(order);
-                            logger.info("开始处理归档任务"+order.getTaskSerialNumber());
-                            processDATask(order);
-                            break;
-                        case "PRTask":
-                            orderService.updateById(order);
-                            logger.info("开始处理产品任务"+order.getTaskSerialNumber());
-                            prTaskAction.doTriggerQATask(order);
-                            break;
-                    }
+        }
+    }
+    public void readyTask(List<WorkflowOrder> orderList,String orderStatus,int size)throws Exception{
+        if (orderList.size()!=0){
+            //todo 小心越界
+            if (orderStatus.equals("8")){
+                size=orderList.size()+1;
+            }else if (orderStatus.equals("1")){
+                if (size>orderList.size())size=orderList.size();
+            }
+            for (int i=0;i<size;i++){
+                WorkflowOrder order = orderList.get(i);
+                logger.info("发现任务"+order.getTaskMode()+"的任务号是"+order.getTaskSerialNumber());
+                String orderType = order.getOrderType().split("_")[0];
+                order.setOrderStatus("2");
+                switch (orderType){
+                    case "QATask":
+                        orderService.updateById(order);
+                        logger.info("开始处理QA任务"+order.getTaskSerialNumber());
+                        qaTaskAction.process(order);
+                        break;
+                    case "DATask":
+                        orderService.updateById(order);
+                        logger.info("开始处理归档任务"+order.getTaskSerialNumber());
+                        processDATask(order);
+                        break;
+                    case "PRTask":
+                        orderService.updateById(order);
+                        logger.info("开始处理产品任务"+order.getTaskSerialNumber());
+                        prTaskAction.doTriggerQATask(order);
+                        break;
                 }
             }
         }
@@ -94,8 +107,9 @@ public class ScheduleHoldTask {
                         break;
                     case "ondatabase":
                         if (t.getSatelliteName().equals("ZY-3B"))t.setSatelliteName("ZY302");
-                        File receiver_Dir3 = new File(Config.local_dir+"/"+t.getSatelliteName()+"/"+t.getJobTaskID().substring(3,7)+"/"+t.getJobTaskID());
+                        File receiver_Dir3 = new File(Config.data_dir+"/"+t.getSatelliteName()+"/"+t.getJobTaskID().substring(3,7)+"/"+t.getJobTaskID());
                         //todo 再把卫星给换回来
+                        logger.info(receiver_Dir3.toString()+"鲁宁是这个");
                         if (t.getSatelliteName().equals("ZY302"))t.setSatelliteName("ZY-3B");
                         dataArchiveAction.processDataArchive(receiver_Dir3,t);
                         result = true;

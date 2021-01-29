@@ -61,7 +61,7 @@ public class DataArchiveInqAction {
                 return ret;
             }
             List<Ml0Info> lis = new ArrayList<>();
-            Thread.sleep(120000);
+           // Thread.sleep(120000);
             lis = ml0InfoService.getL0Info(wi.jobTaskID,"");
             if (lis.size()==0||lis==null){
                 if (wi.state== ExecutingState.Failed.ordinal() ){    //WorkflowInfo.STATE_FAILURE
@@ -173,7 +173,7 @@ public class DataArchiveInqAction {
                     case GF1C:
                     case GF1D:
                     case CASEARTH:
-                        Thread.sleep(240000);
+                        //Thread.sleep(240000);
                         lis = ml0InfoService.getL0Info(wi.jobTaskID,ri.signalID);      //表gt_m_l0中
                         break;
                     case ZY3B:
@@ -203,7 +203,7 @@ public class DataArchiveInqAction {
             }
             for (Ml0Info i : lis) {
                 try {
-                    Thread.sleep(12000);
+                    //Thread.sleep(12000);
                     List<Mcat> sis = mcatManagerService.getCatInfo(wi.jobTaskID, i.segmentid);          //表gt_m_cat中
                     if (sis.size()==0||sis==null){
                         dataStatus.dataExecutingState = DataExecutingState.Failed;

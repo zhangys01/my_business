@@ -31,7 +31,7 @@ public class ProcessUtil {
 //todo 修改webservice方式为redis方式
     public  String submitProcess(String orderXml,int waitTimeout) throws Exception{
        //向工作流引擎提交流程订单，waitTimeout为提交订单后等待记录创建的超时时间(秒)。记录创建成功则返回orderId，否则抛异常。
-        logger.debug("submitting process-order: " + orderXml);
+        logger.info("submitting process-order: " + orderXml);
         String orderId=validateOrder(orderXml);
         Jedis redis = new Jedis(Config.redisIp,Config.redisPort);
         redis.lpush("dpps:queue:order",orderXml);
@@ -42,10 +42,11 @@ public class ProcessUtil {
             ProcessInfo info = processInfoService.getById(orderId);
             if (info!=null) {
                logger.info("生成流程"+orderId);
+               waitTotal = waitTimeout;
             }
             waitTotal+=5;
         } while (waitTotal < waitTimeout);
-        throw new Exception("jbpm order record not found: " + orderId);
+        return orderId;
     }
     //验证所生成的订单xml的合法性，避免提交语法错误的订单，如果合法返回订单ID
     protected static String validateOrder(String orderXml) throws Exception{

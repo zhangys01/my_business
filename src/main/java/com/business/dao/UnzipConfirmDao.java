@@ -9,4 +9,7 @@ import com.business.entity.UnzipConfirm;
  * Created by w_kiven on 2020/12/4 15:20
  */
 public interface UnzipConfirmDao extends BaseMapper<UnzipConfirm> {
+    void saveConfrim(int id,String activitId,String cancelId,int status);
+    int selectMaxId();
+
 }

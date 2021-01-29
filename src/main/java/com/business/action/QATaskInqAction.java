@@ -309,7 +309,6 @@ public class QATaskInqAction  {
         List<Mr0Info> infos = null;
         try {
             for (int k=0;k!=50;k++){
-                Thread.sleep(2000);
                 infos = mr0InfoService.getMr0Info(order.getJobTaskID());
                 if (infos.size()!=0){
                     break;

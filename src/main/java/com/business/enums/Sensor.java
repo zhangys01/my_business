@@ -58,6 +58,7 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("NAD");
                 sensorList.add("FWD");
                 sensorList.add("BWD");
+                break;
         }
         return sensorList;
     }

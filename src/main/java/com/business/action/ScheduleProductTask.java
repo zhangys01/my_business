@@ -45,22 +45,24 @@ public class ScheduleProductTask {
     private ReportUtil reportUtil;
 
     //添加定时任务
-    @Scheduled(cron = "0/2 * * * * ?")   //第0秒钟触发，每5秒中触发一次
+    @Scheduled(cron = "0/3 * * * * ?")   //第0秒钟触发，每5秒中触发一次
     public void configureTasks()  {
         try {
             System.out.println(DateUtil.getTime()+"开始查询产品任务");
             List<WorkflowOrder> productList = new ArrayList<>();
             productList = orderService.selectProductList("2");
+            logger.info("productList的长度"+productList.size());
             if (productList.size()!=0){
                 WorkflowOrder order = productList.get(0);
                 order.setEndTime(DateUtil.getTime());
                     //todo 可能一级生产，也可能是二级生产
                     List<ProcessInfo> infoList = processInfoService.selectProcess(order.getTaskSerialNumber());
+                    logger.info("infoList的长度"+infoList.size());
                     ProductUnzipConfig unzipNode = productConfigManagerService.findByStatus("0");
                     int j=0;
                     do {
                         if (unzipNode==null){
-                            Thread.sleep(1000);
+                            //Thread.sleep(1000);
                             unzipNode = productConfigManagerService.findByStatus("0");
                             j++;
                         }

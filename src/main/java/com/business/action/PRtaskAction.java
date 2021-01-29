@@ -43,6 +43,7 @@ public class PRtaskAction {
         //todo 根据订单景ID获取景
         //todo  生产订单没有jobTaskId
         Mcat s = mcatManagerService.selectBysceneId(t.getSceneID());
+        logger.info("景ID是"+s.getSceneid());
         if (t.getProductLevel().equals("L1")){
             deleteProduct("L1",s.getSceneid());
         }else{
@@ -63,6 +64,9 @@ public class PRtaskAction {
                 case "ZY-1E":
                     orderXml = ProcessType.ZY1E_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
                     break;
+                case "CBERS04A":
+                    orderXml = ProcessType.CB4A_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
             }
             //提交流程
             processUtil.submitProcess(orderXml, Config.submit_order_timeout);
@@ -78,6 +82,9 @@ public class PRtaskAction {
                     break;
                 case "ZY-1E":
                     orderXml = ProcessType.ZY1E_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+                case "CBERS04A":
+                    orderXml = ProcessType.CB4A_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
                     break;
             }
             logger.debug("generate process order: \n" + orderXml);

@@ -13,4 +13,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UnzipConfirmServiceImpl extends ServiceImpl<UnzipConfirmDao, UnzipConfirm> implements UnzipConfirmService {
+    @Override
+    public void saveConfrim(int id,String activitId,String cancelId,int status) {
+        baseMapper.saveConfrim( id,activitId, cancelId,status);
+    }
+
+    @Override
+    public int selectMaxId() {
+        return baseMapper.selectMaxId();
+    }
 }
