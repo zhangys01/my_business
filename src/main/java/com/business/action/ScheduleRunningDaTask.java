@@ -53,10 +53,13 @@ public class ScheduleRunningDaTask {
                     case "ZY-3B":
                         satelliteName = "ZY3";
                         break;
+                    case "CBERS04A":
+                        satelliteName = "CB4A";
+                        break;
                 }
                 String status2 = "";
                 List<ProcessInfo> L0InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_R0_TO_L0");
-                logger.info(L0InfoList+"这是归档的L0");
+                logger.info(L0InfoList.size()+"这是归档的L0");
                 if (L0InfoList.size()!= 0) {
                     status2 = reportUtil.getProcessStatus(L0InfoList, order);
                 }

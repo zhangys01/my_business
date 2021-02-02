@@ -48,6 +48,8 @@ public class ReportUtil {
     private Ml0InfoService ml0InfoService;
     @Resource
     private ProcessUtil processUtil;
+    @Resource
+    private DataArchiveInqAction dataArchiveInqAction;
     private static String QAReportFile;    //相对路径
     private static OracleProcessInfoImpl oracleInfoImpl;
     private Marshaller marshaller;
@@ -396,6 +398,12 @@ public class ReportUtil {
                 break;
             }
         }
+        WorkFlowDataArchive dataArchive = new WorkFlowDataArchive();
+        dataArchive.setJobtaskid(order.getJobTaskID());
+        dataArchive.setOrderid(order.getTaskSerialNumber());
+        dataArchive.setCreatetime(order.getStartTime());
+        dataArchive.setUpdatetime(DateUtil.getTime());
+        dataArchive.setReply(0);
         if (status.equals("success")) {
             order.setOrderStatus("3");
             order.setEndTime(DateUtil.getTime());
@@ -408,7 +416,7 @@ public class ReportUtil {
             oracleInfoImpl.delL0data(order.getJobTaskID());
             oracleInfoImpl.insertL0Data(l0data.get(0));
             //todo 生成DataArchiveRep
-            WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
+            //WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
             rep = generateDataArchiveRep(order,dataArchive);
             WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
             archiveInfo.setReplyfile(rep.replyFileName);
@@ -420,7 +428,7 @@ public class ReportUtil {
             order.setOrderStatus("4");
             orderService.updateById(order);
             //生成DataArchiveRep
-            WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
+           // WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
 
             rep = generateDataArchiveRep(order, dataArchive);
             WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
@@ -432,12 +440,12 @@ public class ReportUtil {
     }
 
     public DataArchiveRep generateDataArchiveRep(WorkflowOrder order, WorkFlowDataArchive wi) throws Exception {
-
+        logger.info("走进归档完成通知的处理流程");
         ArchiveWorkflowInfo archiveWorkflowInfo = new ArchiveWorkflowInfo();
         archiveWorkflowInfo.jobTaskID = wi.getJobtaskid();
         archiveWorkflowInfo.orderId = wi.getOrderid();
         archiveWorkflowInfo.reply = wi.getReply();
-        archiveWorkflowInfo.dataFile = wi.getDatafile();
+       // archiveWorkflowInfo.dataFile = wi.getDatafile();
         archiveWorkflowInfo.createTime = wi.getCreatetime();
         archiveWorkflowInfo.updateTime = wi.getUpdatetime();
         DataArchiveRep rep=new DataArchiveRep();
@@ -447,7 +455,7 @@ public class ReportUtil {
         rep.description = "自动回复";
         rep.dataStatusRepInfo = new ArrayList<>();
         //重用DataArchiveInqAction的方法，需每次创建新实例
-        rep.dataStatusRepInfo.add(new DataArchiveInqAction().generateJobInfo(archiveWorkflowInfo));
+        rep.dataStatusRepInfo.add(dataArchiveInqAction.generateJobInfo(archiveWorkflowInfo));
         //生成响应文件
         String fileName=ResponseType.DataArchiveRep.buildResponseFileName(order.getOrderType().split("_")[1],null);
         generateReponseFile(rep,fileName);

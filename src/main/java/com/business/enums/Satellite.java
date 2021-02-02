@@ -16,6 +16,7 @@ public enum  Satellite {  //枚举名：卫星简称
     GF1D("GF-1D"),
     ZY3B("ZY-3B"),
     ZY302("ZY302"),
+    ZY1E("ZY1E"),
     CB4A("CB4A"),
     CBERS04A("CBERS04A"),
     CASEARTH("CASEARTH");

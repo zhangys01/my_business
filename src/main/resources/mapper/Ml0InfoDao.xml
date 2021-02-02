@@ -4,7 +4,7 @@
 <mapper namespace="com.business.dao.Ml0InfoDao">
 
     <select id="getL0Info" parameterType="String" resultType="com.business.entity.Ml0Info">
-        select id,segmentid,signalid,jobtaskid,satelliteid,sensorid,datastarttime,dataendtime from gt_m_l0 where jobtaskid=#{jobtaskid}
+        select id,segmentid,signalid,jobtaskid,satelliteid,sensorid,datastarttime,dataendtime,filepath from gt_m_l0 where jobtaskid=#{jobTaskId}
         <if test="signalId!='' and signalId!=null">
             and signalid = #{signalId}
         </if>

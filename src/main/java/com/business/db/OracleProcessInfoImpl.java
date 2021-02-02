@@ -31,6 +31,7 @@ public class OracleProcessInfoImpl {
             conn = OracleDBUtil.getConnection();
             ptmt = conn.prepareStatement(sql);
             ptmt.execute(sql);
+            logger.info("更新集中存储表归档表成功"+jobTaskId);
         }catch (Exception e){
             logger.info("更新集中存储表归档表失败"+e);
         }finally {
@@ -47,6 +48,7 @@ public class OracleProcessInfoImpl {
             conn = OracleDBUtil.getConnection();
             ptmt = conn.prepareStatement(sql);
             ptmt.execute(sql);
+            logger.info("执行删除集中存储成功");
         }catch (Exception e){
             logger.info("删除0级表失败："+e);
         }finally {
@@ -79,6 +81,7 @@ public class OracleProcessInfoImpl {
             ps.setString(6,filePath);
             ps.setString(7,"onDisk");
             ps.execute();
+            logger.info("插入集中存储0级数据成功"+l0DATA.getJobtaskid());
         }catch (Exception e){
             logger.error("插入集中存储0级表失败"+e);
         }finally {

@@ -100,12 +100,17 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/commons-io-1.4.jar</systemPath>
         </dependency>
-        <dependency>
-            <groupId>ojdbc</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>6</version>
+        <!--<dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+           &lt;!&ndash; <version>11.2.0.1.0</version>&ndash;&gt;
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/ojdbc6.jar</systemPath>
+        </dependency>-->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.4</version>
         </dependency>
     </dependencies>
 

@@ -92,7 +92,7 @@ public class DataArchiveAction {
                 }
                 break;
                 //todo ZY1E cbers04A
-            case"ZY-1E":
+            case"ZY1E":
                 dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"ZY1E_R0_TO_L0");
                 if(dataInfoList.size()==0) {
                     unzipOrderXml = ProcessType.ZY1E_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));

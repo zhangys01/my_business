@@ -49,6 +49,7 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("TLC");
                 break;
             case"ZY-1E":
+            case"ZY1E":
             case"CBERS04A":
                 sensorList.add("PAN");
                 sensorList.add("MSS");

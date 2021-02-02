@@ -22,6 +22,6 @@
 		select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,dataSelectType,productLevel,out_productdir,orderStatus,startTime,endTime,logName,logPath,resampleKernal,sceneID,fileResource from workflow_order where taskSerialNumber = #{taskId}
 	</select>
 	<select id="findDataskByJobId" parameterType="String"  resultType="com.business.entity.WorkflowOrder">
-		SELECT orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,out_productdir,orderStatus,startTime,endTime,logName,sceneID,logPath FROM	workflow_order where jobTaskID = #{jobTaskId} and taskMode='DATask' order BY  startTime desc limit 1
+		SELECT orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,out_productdir,orderStatus,startTime,endTime,logName,sceneID,logPath,orderStatus FROM	workflow_order where jobTaskID = #{jobTaskID} and taskMode='DATask' order BY  startTime desc limit 1
 	</select>
 </mapper>

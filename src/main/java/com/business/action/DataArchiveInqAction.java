@@ -44,9 +44,8 @@ public class DataArchiveInqAction {
             String jobTaskID=wi.jobTaskID;
             DataStatusRepInfo ret = new DataStatusRepInfo();
             ret.jobTaskID=jobTaskID;
-            logger.info("调用生成归档完成通知方法，生成rep"+wi);
             //分情况
-            WorkflowOrder order =  orderService.findDataskByJobId(jobTaskID);
+            WorkflowOrder order =  orderService.findDataskByJobId(wi.jobTaskID);
             if (order.getOrderStatus().equals("3")){
                 wi.state = 2;
             }else if (order.getOrderStatus().equals("4")){
@@ -157,15 +156,16 @@ public class DataArchiveInqAction {
 
         private DataArchiveInfo generateFileInfo(WorkflowOrder order,Mr0Info ri,String chanelId,ArchiveWorkflowInfo wi){
             DataArchiveInfo ret = new DataArchiveInfo();
-            ret.satellite= Satellite.valueOf(ri.satellite);
-            ret.channelID=ri.channelID;
-            ret.dataFileName=ri.signalID+"."+ Constants.EXT_DAT;
-            ret.receiveDataStartTime=ri.receiveStartTime.substring(0,19);
-            ret.receiveDataEndTime=ri.receiveEndTime.substring(0,19);
+            ret.satellite= Satellite.valueOf(ri.getSatelliteid());
+            ret.channelID=ri.getChannelID();
+            ret.dataFileName=ri.getSignalID()+"."+ Constants.EXT_DAT;
+            ret.receiveDataStartTime=ri.getReceiveStartTime().substring(0,19);
+            ret.receiveDataEndTime=ri.getReceiveEndTime().substring(0,19);
             ret.executingStartTime=order.getStartTime().substring(0,19);
             ret.executingEndTime=order.getEndTime().substring(0,19);
             DataArchiveInfo dataStatus = new DataArchiveInfo();
             //查询L0信息，通过查询结果情况，判断该R0文件的处理状态
+            logger.info("走到这里了非");
             List<Ml0Info> lis = new ArrayList<>();
             try {
                 switch (ret.satellite){

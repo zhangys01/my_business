@@ -22,7 +22,6 @@ public interface WorkFlowOrderService extends IService<WorkflowOrder> {
     /*查询执行中的QA订单*/
     List<WorkflowOrder> selectQataskList(String orderStatus);
 
-
     WorkflowOrder findDataskByJobId(String jobTaskId);
 
 

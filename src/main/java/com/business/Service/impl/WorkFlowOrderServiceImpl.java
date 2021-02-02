@@ -56,14 +56,7 @@ public class WorkFlowOrderServiceImpl extends ServiceImpl<WorkFlowOrderDao,Workf
     //todo 根据jobtaskID获取最新的DA任务
     @Override
     public WorkflowOrder findDataskByJobId(String jobTaskId){
-        WorkflowOrder order = new WorkflowOrder();
-        try {
-            order = baseMapper.findDataskByJobId(jobTaskId);
-        } catch (Exception e) {
-            logger.info(e);
-        } finally {
-            logger.info("查找DA任务关闭");
-        }
+        WorkflowOrder order = baseMapper.findDataskByJobId(jobTaskId);
         return order;
     }
 }

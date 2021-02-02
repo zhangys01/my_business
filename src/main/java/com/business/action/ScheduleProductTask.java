@@ -57,18 +57,23 @@ public class ScheduleProductTask {
                 order.setEndTime(DateUtil.getTime());
                     //todo 可能一级生产，也可能是二级生产
                     List<ProcessInfo> infoList = processInfoService.selectProcess(order.getTaskSerialNumber());
-                    logger.info("infoList的长度"+infoList.size());
-                    ProductUnzipConfig unzipNode = productConfigManagerService.findByStatus("0");
-                    int j=0;
-                    do {
-                        if (unzipNode==null){
-                            //Thread.sleep(1000);
-                            unzipNode = productConfigManagerService.findByStatus("0");
-                            j++;
-                        }
-                    }while (unzipNode==null);
-                    unzipNode.setIs_unzip("1");
-                    productConfigManagerService.updateById(unzipNode);
+                    //todo 如果输出文件夹为空， 则不需要压缩，则不用查unzipNode
+                        ProductUnzipConfig unzipNode = new ProductUnzipConfig();
+                    if (order.getOut_productdir()==null){
+                        logger.info("infoList的长度"+infoList.size());
+                        unzipNode = productConfigManagerService.findByStatus("0");
+                        int j=0;
+                        do {
+                            logger.info(unzipNode+"压缩node");
+                            if (unzipNode==null){
+                                //Thread.sleep(1000);
+                                unzipNode = productConfigManagerService.findByStatus("0");
+                                j++;
+                            }
+                        }while (unzipNode==null);
+                        unzipNode.setIs_unzip("1");
+                        productConfigManagerService.updateById(unzipNode);
+                    }
                     if (infoList.size() != 0) {
                         if (infoList.get(0).getStatus().equals("Completed")) {
                             order.setOrderStatus("3");

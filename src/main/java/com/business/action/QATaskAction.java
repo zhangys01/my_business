@@ -359,8 +359,10 @@ public class QATaskAction{
 
     //获取路径
     public String getFileName(String []names,String sensor,File l0Dir)throws Exception{
+        logger.info("获取dat路径"+l0Dir);
         String name = names[0]+"_"+sensor+"_"+names[2]+"_"+names[3]+"_"+names[4]+"_R0";
         String file = l0Dir+"/"+sensor+"/"+name+"_01.dat,"+l0Dir+"/"+sensor+"/"+name+"_02.dat,"+l0Dir+"/"+sensor+"/"+name+"_03.dat";
+        logger.info("查看下file"+file);
         return file;
     }
 
@@ -382,7 +384,6 @@ public class QATaskAction{
 
         File l0Dir = new File(Config.archive_root,"/"+scene.getSatelliteid()+"/"+items[3].substring(0,6)+"/"+items[3]+"/"+t.getJobTaskID());    //条带目录
 
-        map.put("RAWFILE",l0Dir);
         map.put("METAFILE",scene.getFilepath());
         String day= orderIdSuffix.split("_")[0];
         File L1Dir = null;

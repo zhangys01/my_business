@@ -25,19 +25,11 @@ public class OracleDBUtil {
             properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties"));
             dataSource = new DruidDataSource();
             //四个基本属性
-            dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+            //dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+            dataSource.setDriverClassName("oracle.jdbc.OracleDriver");
             dataSource.setUrl(properties.getProperty("oracle_url"));
             dataSource.setUsername(properties.getProperty("oracle_user"));
             dataSource.setPassword(properties.getProperty("oracle_password"));
-            //其他属性
-            //初始大小
-            dataSource.setInitialSize(Integer.parseInt(properties.getProperty("InitialSize")));
-            //最大大小
-            dataSource.setMaxActive(Integer.parseInt(properties.getProperty("MaxActive")));
-            //最小大小
-            dataSource.setMinIdle(Integer.parseInt(properties.getProperty("MinIdle")));
-            //检查时间
-            dataSource.setMaxWait(Integer.parseInt(properties.getProperty("MaxWait")));
         } catch (Exception e) {
             e.printStackTrace();
         }
