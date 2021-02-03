@@ -325,13 +325,14 @@ public class ReportUtil {
         //所注册的类必须存在@XmlRootElement标注，否则marshal时无法获知根标签名
         File tmp=new File(Config.toOMO_sendingDir, Constants.TEMP_FILE_PREFIX+fileName); //先写为临时文件名(TEMP_FILE_PREFIX为在前面加！)
         logger.info("kaisss tongb"+tmp);
-        JAXBContext jc = JAXBContext.newInstance(QATask.class.getPackage().getName());
+        XMLUtil.convertToXml(response,tmp.toString());
+       /* JAXBContext jc = JAXBContext.newInstance(QATask.class.getPackage().getName());
         marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         synchronized (marshaller){  //注意同步使用，看其它线程是否在用
             marshaller = jc.createMarshaller();
             marshaller.marshal(response,tmp);
-        }
+        }*/
         logger.info("1111");
         File dest=new File(Config.toOMO_sendingDir, fileName);
         logger.info("desss"+dest.toString());
