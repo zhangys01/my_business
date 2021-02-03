@@ -165,7 +165,6 @@ public class DataArchiveInqAction {
             ret.executingEndTime=order.getEndTime().substring(0,19);
             DataArchiveInfo dataStatus = new DataArchiveInfo();
             //查询L0信息，通过查询结果情况，判断该R0文件的处理状态
-            logger.info("走到这里了非");
             List<Ml0Info> lis = new ArrayList<>();
             try {
                 switch (ret.satellite){
@@ -174,7 +173,7 @@ public class DataArchiveInqAction {
                     case GF1D:
                     case CASEARTH:
                         //Thread.sleep(240000);
-                        lis = ml0InfoService.getL0Info(wi.jobTaskID,ri.signalID);      //表gt_m_l0中
+                        lis = ml0InfoService.getL0Info(wi.jobTaskID,ri.getSignalID());      //表gt_m_l0中
                         break;
                     case ZY3B:
                         lis = ml0InfoService.getL0Info(wi.jobTaskID,"");
@@ -225,6 +224,11 @@ public class DataArchiveInqAction {
                             sa=getSensorData("2m8mTDICCD",i.dataStarttime,i.dataEndtime);
                             sas.add(sa);
                             break;
+                        case CBERS04A:
+                        case CB4A:
+                            sa=getSensorData("WPM",i.dataStarttime,i.dataEndtime);
+                            sas.add(sa);
+                            break;
                         case ZY3B:
                             if (chanelId.equals("S1")){
                                 if (i.sensor.equals("NAD")){
@@ -244,7 +248,7 @@ public class DataArchiveInqAction {
                             break;
                     }
                 }catch (Exception e){
-                    logger.info(e);
+                    logger.error(e);
                 }
             }
             List<SensorDataArchiveInfo> sasSingle = Sensor.toSimplify(sas);             //参数获取

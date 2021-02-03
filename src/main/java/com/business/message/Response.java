@@ -30,4 +30,15 @@ public abstract class Response {  //响应基类
     @XmlPath("fileHeader/authorInfo/text()")
     public String authorInfo;
 
+    @Override
+    public String toString() {
+        return "Response{" +
+                "title='" + title + '\'' +
+                ", identificationCode='" + identificationCode + '\'' +
+                ", source='" + source + '\'' +
+                ", destination='" + destination + '\'' +
+                ", createdTime='" + createdTime + '\'' +
+                ", authorInfo='" + authorInfo + '\'' +
+                '}';
+    }
 }

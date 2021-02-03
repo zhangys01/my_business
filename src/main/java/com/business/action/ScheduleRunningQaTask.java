@@ -39,7 +39,7 @@ public class ScheduleRunningQaTask extends Thread {
 
     //添加定时任务
     @Scheduled(cron = "0/5 * * * * ?")   //第4秒钟触发，每5秒中触发一次
-    public void configureTasks() throws Exception {
+    public synchronized void configureTasks() throws Exception {
          try{
              System.out.println(DateUtil.getTime()+"开始查询QA任务");
             List<WorkflowOrder> orderList = new ArrayList<>();

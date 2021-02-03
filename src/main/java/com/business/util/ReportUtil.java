@@ -17,6 +17,7 @@ import com.business.enums.ResponseType;
 import com.business.info.ArchiveWorkflowInfo;
 import com.business.info.QATaskWorkflowInfo;
 import com.business.message.DataArchiveRep;
+import com.business.message.QATask;
 import com.business.message.QATaskRep;
 import com.business.message.Response;
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.nio.file.Files;
@@ -42,7 +44,8 @@ public class ReportUtil {
     private ProcessInfoService processInfoService;
     @Autowired
     private WorkFlowDataArchiveService workFlowDataArchiveService;
-   /* @Autowired
+    private Marshaller marshaller;
+    /* @Autowired
     private SysDictionariesService dictionariesService;*/
     @Autowired
     private Ml0InfoService ml0InfoService;
@@ -52,7 +55,6 @@ public class ReportUtil {
     private DataArchiveInqAction dataArchiveInqAction;
     private static String QAReportFile;    //相对路径
     private static OracleProcessInfoImpl oracleInfoImpl;
-    private Marshaller marshaller;
     private static final int BUFFER_SIZE = 2 * 1024;
 
     //todo 卫星分类型
@@ -308,6 +310,7 @@ public class ReportUtil {
         rep.taskBasicRepInfo.add(new QATaskInqAction().generateTaskInfo(wi));
         //生成响应文件
         String fileName=ResponseType.QATaskRep.buildResponseFileName(order.getOrderType().split("_")[1],wi.taskId);
+
         generateReponseFile(rep,fileName);
         rep.replyFileName=fileName;
         logger.info("响应文件"+rep);
@@ -321,12 +324,19 @@ public class ReportUtil {
         }
         //所注册的类必须存在@XmlRootElement标注，否则marshal时无法获知根标签名
         File tmp=new File(Config.toOMO_sendingDir, Constants.TEMP_FILE_PREFIX+fileName); //先写为临时文件名(TEMP_FILE_PREFIX为在前面加！)
+        logger.info("kaisss tongb"+tmp);
+        JAXBContext jc = JAXBContext.newInstance(QATask.class.getPackage().getName());
+        marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         synchronized (marshaller){  //注意同步使用，看其它线程是否在用
+            marshaller = jc.createMarshaller();
             marshaller.marshal(response,tmp);
         }
+        logger.info("1111");
         File dest=new File(Config.toOMO_sendingDir, fileName);
+        logger.info("desss"+dest.toString());
         Files.move(tmp.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING); //序列化成功后恢复原名。重名替换，省得麻烦
-        logger.debug("generated response file: "+dest.getPath());       //debug时才会输出
+        logger.info("generated response file: "+dest.getPath());       //debug时才会输出
     }
 
     public void doTriggerQ64(WorkflowOrder wi) throws Exception {
@@ -418,11 +428,12 @@ public class ReportUtil {
             //todo 生成DataArchiveRep
             //WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
             rep = generateDataArchiveRep(order,dataArchive);
-            WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
+            logger.info("生成归档完成通知成功");
+      /*      WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
             archiveInfo.setReplyfile(rep.replyFileName);
             archiveInfo.setUpdatetime(DateUtil.getTime());
             archiveInfo.setReply(1);
-            workFlowDataArchiveService.updateById(archiveInfo);
+            workFlowDataArchiveService.updateById(archiveInfo);*/
         } else if (status.equals("error")) {
             order.setEndTime(DateUtil.getTime());
             order.setOrderStatus("4");
@@ -431,11 +442,12 @@ public class ReportUtil {
            // WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
 
             rep = generateDataArchiveRep(order, dataArchive);
-            WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
+            logger.info("生成归档完成通知成功");
+   /*         WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
             archiveInfo.setReplyfile(rep.replyFileName);
             archiveInfo.setUpdatetime(DateUtil.getTime());
             archiveInfo.setReply(1);
-            workFlowDataArchiveService.updateById(archiveInfo);
+            workFlowDataArchiveService.updateById(archiveInfo);*/
         }
     }
 

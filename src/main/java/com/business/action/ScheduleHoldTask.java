@@ -36,7 +36,7 @@ public class ScheduleHoldTask {
     //3.添加定时任务
 
     @Scheduled(cron = "0/4 * * * * ? ")   //第0秒钟触发，每5秒中触发一次
-    public void configureTasks()throws Exception{
+    public synchronized void configureTasks()throws Exception{
         System.out.println(DateUtil.getTime()+"开始获取等待状态任务");
         List<WorkflowOrder>runList = orderService.selectList("2");
         int size = Config.running_number;

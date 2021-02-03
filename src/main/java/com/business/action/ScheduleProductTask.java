@@ -46,7 +46,7 @@ public class ScheduleProductTask {
 
     //添加定时任务
     @Scheduled(cron = "0/3 * * * * ?")   //第0秒钟触发，每5秒中触发一次
-    public void configureTasks()  {
+    public synchronized void configureTasks()  {
         try {
             System.out.println(DateUtil.getTime()+"开始查询产品任务");
             List<WorkflowOrder> productList = new ArrayList<>();

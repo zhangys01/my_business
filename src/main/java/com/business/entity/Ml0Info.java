@@ -1,16 +1,24 @@
 package com.business.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName(value = "gt_m_l0")
 public class Ml0Info {
 
+    @TableField(value = "signalid")
     public String signalid;
+    @TableField(value = "segmentid")
     public String segmentid;
+    @TableField(value = "sensorid")
     public String sensor;
+    @TableField(value = "datastarttime")
     public String dataStarttime;
+    @TableField(value = "dataendtime")
     public String dataEndtime;
+    @TableField(value = "jobtaskid")
     private String jobtaskid;
+    @TableField(value = "satelliteid")
     private String satelliteid;
 
     private String filepath;
