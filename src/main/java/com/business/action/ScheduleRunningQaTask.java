@@ -41,74 +41,79 @@ public class ScheduleRunningQaTask extends Thread {
     @Scheduled(cron = "0/5 * * * * ?")   //第4秒钟触发，每5秒中触发一次
     public synchronized void configureTasks() throws Exception {
          try{
-             System.out.println(DateUtil.getTime()+"开始查询QA任务");
             List<WorkflowOrder> orderList = new ArrayList<>();
             orderList = orderService.selectQataskList("2");
+            logger.info(DateUtil.getTime()+"当前执行中的QA任务数量为"+orderList.size());
             if (orderList.size()!=0){
-                WorkflowOrder order = orderList.get(0);
-                order.setEndTime(DateUtil.getTime());
-                //先生成报告文件路径
-                QATaskWorkflowInfo wi = new QATaskWorkflowInfo();
-                List<ProcessInfo> dataInfoList = new ArrayList<>();
-                String satelliteName = "";
-                switch (order.getSatelliteName()) {
-                    case "GF-1B":
-                    case "GF-1C":
-                    case "GF-1D":
-                        satelliteName = "GF1";
-                        break;
-                    case "CASEARTH":
-                    case "ZY1E":
-                        satelliteName = order.getSatelliteName();
-                        break;
-                    case "ZY-3B":
-                        satelliteName="ZY3";
-                        break;
-                }
-                if (order.getTaskMode().equals("Q61")) {
-                    dataInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
-                    reportUtil.ReportStatusQ61(order, dataInfoList, wi);
-                }
-                if (order.getTaskMode().equals("Q62")) {
-                    reportUtil.getReportStatus(order, "Q62");
-                }
-                if (order.getTaskMode().equals("Q63")) {
-                    List<ProcessInfo> infoQ63 = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
-                    reportUtil.ReportStatusSuccess(order, "Q63", infoQ63);
-                }
-                if (order.getTaskMode().equals("Q61;Q62")) {
-                    List<ProcessInfo> reportInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
-                    reportUtil.ReportStatusSuccess(order, "Q61;Q62", reportInfoList);
-                }
-                if (order.getTaskMode().equals("Q61;Q63")) {
-                    String status1 = "";
-                    List<ProcessInfo> reportInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
-                    if (reportInfoList.size() != 0) {
-                        status1 = reportUtil.getProcessStatus(reportInfoList, order);
+                for (int i=0;i<orderList.size();i++){
+                    WorkflowOrder order = orderList.get(i);
+                    order.setEndTime(DateUtil.getTime());
+                    //先生成报告文件路径
+                    QATaskWorkflowInfo wi = new QATaskWorkflowInfo();
+                    List<ProcessInfo> dataInfoList = new ArrayList<>();
+                    String satelliteName = "";
+                    switch (order.getSatelliteName()) {
+                        case "GF-1B":
+                        case "GF-1C":
+                        case "GF-1D":
+                            satelliteName = "GF1";
+                            break;
+                        case "CASEARTH":
+                        case "ZY1E":
+                            satelliteName = order.getSatelliteName();
+                            break;
+                        case "ZY-3B":
+                            satelliteName = "ZY3";
+                            break;
+                        case "CBERS04A":
+                            satelliteName = "CB4A";
+                            break;
                     }
-                    List<ProcessInfo> Q63InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
-                    reportUtil.ReportStatusQ61Q63(status1, order, Q63InfoList, wi);
-                }
-                if (order.getTaskMode().equals("Q62;Q63")) {
-                    List<ProcessInfo> Q63infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
-                    reportUtil.ReportStatusQ62Q63(order, Q63infoList, wi);
-                }
-                if (order.getTaskMode().equals("Q61;Q62;Q63")) {
-                    String status1 = "";
-                    List<ProcessInfo> Q61infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
-                    if (Q61infoList.size() != 0) {
-                        status1 = reportUtil.getProcessStatus(Q61infoList, order);
+                    if (order.getTaskMode().equals("Q61")) {
+                        dataInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
+                        reportUtil.ReportStatusQ61(order, dataInfoList, wi);
                     }
-                    List<ProcessInfo> Q63infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
-                    reportUtil.ReportStatusQ61Q62Q63(status1, order, Q63infoList, wi);
-                }
-                if (order.getTaskMode().equals("Q64")) {
-                    ProcessInfo Q64info = processInfoService.getProcessByName(order.getTaskSerialNumber(), satelliteName+"_Q64_DIFF");
-                    reportUtil.ReportStatusQ64(Q64info, order, wi);
-                }
-                if (order.getTaskMode().equals("Q65")) {
-                    dataInfoList = processInfoService.selectProcess(order.getTaskSerialNumber());
-                    reportUtil.ReportStatusQ65(dataInfoList, order, wi);
+                    if (order.getTaskMode().equals("Q62")) {
+                        reportUtil.getReportStatus(order, "Q62");
+                    }
+                    if (order.getTaskMode().equals("Q63")) {
+                        List<ProcessInfo> infoQ63 = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
+                        reportUtil.ReportStatusSuccess(order, "Q63", infoQ63);
+                    }
+                    if (order.getTaskMode().equals("Q61;Q62")) {
+                        List<ProcessInfo> reportInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
+                        reportUtil.ReportStatusSuccess(order, "Q61;Q62", reportInfoList);
+                    }
+                    if (order.getTaskMode().equals("Q61;Q63")) {
+                        String status1 = "";
+                        List<ProcessInfo> reportInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
+                        if (reportInfoList.size() != 0) {
+                            status1 = reportUtil.getProcessStatus(reportInfoList, order);
+                        }
+                        List<ProcessInfo> Q63InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
+                        reportUtil.ReportStatusQ61Q63(status1, order, Q63InfoList, wi);
+                    }
+                    if (order.getTaskMode().equals("Q62;Q63")) {
+                        List<ProcessInfo> Q63infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
+                        reportUtil.ReportStatusQ62Q63(order, Q63infoList, wi);
+                    }
+                    if (order.getTaskMode().equals("Q61;Q62;Q63")) {
+                        String status1 = "";
+                        List<ProcessInfo> Q61infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");
+                        if (Q61infoList.size() != 0) {
+                            status1 = reportUtil.getProcessStatus(Q61infoList, order);
+                        }
+                        List<ProcessInfo> Q63infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_Q63_CAT_TO_L2A");
+                        reportUtil.ReportStatusQ61Q62Q63(status1, order, Q63infoList, wi);
+                    }
+                    if (order.getTaskMode().equals("Q64")) {
+                        ProcessInfo Q64info = processInfoService.getProcessByName(order.getTaskSerialNumber(), satelliteName+"_Q64_DIFF");
+                        reportUtil.ReportStatusQ64(Q64info, order, wi);
+                    }
+                    if (order.getTaskMode().equals("Q65")) {
+                        dataInfoList = processInfoService.selectProcess(order.getTaskSerialNumber());
+                        reportUtil.ReportStatusQ65(dataInfoList, order, wi);
+                    }
                 }
             }
          } catch (Exception e) {

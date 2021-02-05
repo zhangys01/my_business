@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Component
 @Configuration
@@ -48,32 +49,17 @@ public class ScheduleProductTask {
     @Scheduled(cron = "0/3 * * * * ?")   //第0秒钟触发，每5秒中触发一次
     public synchronized void configureTasks()  {
         try {
-            System.out.println(DateUtil.getTime()+"开始查询产品任务");
             List<WorkflowOrder> productList = new ArrayList<>();
             productList = orderService.selectProductList("2");
-            logger.info("productList的长度"+productList.size());
+            logger.info(DateUtil.getTime()+"当前执行的产品任务数量为："+productList.size());
             if (productList.size()!=0){
+                for (int i =0;i<productList.size();i++){
+
+                }
                 WorkflowOrder order = productList.get(0);
                 order.setEndTime(DateUtil.getTime());
                     //todo 可能一级生产，也可能是二级生产
                     List<ProcessInfo> infoList = processInfoService.selectProcess(order.getTaskSerialNumber());
-                    //todo 如果输出文件夹为空， 则不需要压缩，则不用查unzipNode
-                        ProductUnzipConfig unzipNode = new ProductUnzipConfig();
-                    if (order.getOut_productdir()==null){
-                        logger.info("infoList的长度"+infoList.size());
-                        unzipNode = productConfigManagerService.findByStatus("0");
-                        int j=0;
-                        do {
-                            logger.info(unzipNode+"压缩node");
-                            if (unzipNode==null){
-                                //Thread.sleep(1000);
-                                unzipNode = productConfigManagerService.findByStatus("0");
-                                j++;
-                            }
-                        }while (unzipNode==null);
-                        unzipNode.setIs_unzip("1");
-                        productConfigManagerService.updateById(unzipNode);
-                    }
                     if (infoList.size() != 0) {
                         if (infoList.get(0).getStatus().equals("Completed")) {
                             order.setOrderStatus("3");
@@ -83,47 +69,30 @@ public class ScheduleProductTask {
                             //todo 先判断是否为空
                             //todo Move成功后，先获取产品表里面数据，然后进行存储
                             if (order.getOut_productdir() != null && !"".equals(order.getOut_productdir())) {
-                                logger.info("进行压缩的节点为" + unzipNode.getIp());
-                                String targetDir = order.getOut_productdir().split(";")[0];
-                                //todo 先创建目录
-                                MyHelper.CreateDirectory(new File(targetDir));
-                                //todo 如果是做的二级产品则dir是二级产品的本地路径，否则是一级产品的路径
-                                String dir = order.getOut_productdir().split(";")[1];
-                                String zipDir = dir + ".zip";
-                                FileOutputStream fos1 = new FileOutputStream(new File(zipDir));
-                                //todo L1级别
+                                List<ProductUnzipConfig> productUnzipConfigList = productConfigManagerService.findByStatus("0");
+                                Random random = new Random();
+                                int number = random.nextInt(10);
+                                ProductUnzipConfig unzipNode = productUnzipConfigList.get(number);
                                 if (order.getProductLevel().equals("L1")) {
-                                    //todo 输入输出流压缩文件
-                                    reportUtil.toZip1(dir, fos1, true);
-                                    //todo 开始检验压缩是否成功
-                                     checkUnzip(zipDir,targetDir,dir,fos1,order,unzipNode);
-                                    //todo 压缩成功后，更改节点状态
-                                    unzipNode.setIs_unzip("0");
-                                    productConfigManagerService.updateById(unzipNode);
+                                    String script = Config.product_compress +" "+order.getOut_productdir();
+                                    reportUtil.execShellscript(script, unzipNode.getIp());
                                     //todo move成功后，更新Oracle数据库表
                                     NomalProduct l1 = nomalManagerService.getL1product(order.getSceneID());
                                     oracleInfoImpl.delL1Product(order.getSceneID());
                                     oracleInfoImpl.insertL1product(l1);
                                 } else if (order.getProductLevel().equals("L2")) {
                                     logger.info("二级产品开始压缩");
-                                    //todo 输入输出流压缩文件
-                                    reportUtil.toZip1(dir, fos1, true);
-                                    //todo 检测二级产品是否成功
-                                    checkUnzip(zipDir,targetDir,dir,fos1,order,unzipNode);
-                                    logger.info("一级产品压缩开始");
-                                    String L1Dir = dir.replaceAll("L2DATA", "L1DATA").replaceAll("L2", "L1");
-                                    String L1DirZip = L1Dir + ".zip";
-                                    FileOutputStream fos2 = new FileOutputStream(new File(L1DirZip));
-                                    reportUtil.toZip1(L1Dir, fos2, true);
-                                    //todo 造一个L1的地址
-                                    String targetL1Dir = targetDir.replaceAll("L2", "L1");
+                                    //todo 执行L1
+                                    String L1SourceDir = order.getOut_productdir().split(";")[1].replaceAll("L2DATA", "L1DATA").replaceAll("L2", "L1");
+                                    String targetL1Dir = order.getOut_productdir().split(";")[0].replaceAll("L2", "L1");
                                     MyHelper.CreateDirectory(new File(targetL1Dir));
-                                    //todo 检测压缩是否成功
-                                    checkUnzip(L1DirZip,targetL1Dir,L1Dir,fos2,order,unzipNode);
-                                    //todo 压缩成功后，记得变回之前的
-                                    unzipNode.setIs_unzip("0");
-                                    productConfigManagerService.updateById(unzipNode);
+                                    String script1 = Config.product_compress +" "+targetL1Dir+";"+L1SourceDir;
+                                    reportUtil.execShellscript(script1, unzipNode.getIp());
                                     //todo move成功后，更新数据库表
+                                    //todo 执行L2
+                                    String script2 = Config.product_compress +" "+order.getOut_productdir();
+                                    reportUtil.execShellscript(script2, unzipNode.getIp());
+                                    //todo 修改数据库
                                     NomalProduct l1 = nomalManagerService.getL1product(order.getSceneID());
                                     oracleInfoImpl.delL1Product(order.getSceneID());
                                     oracleInfoImpl.insertL1product(l1);
@@ -140,7 +109,6 @@ public class ScheduleProductTask {
                             logger.info("PRTask is running");
                         }
                     }
-
             }
         }catch (Exception e){
             logger.error("更新产品任务失败："+e.getMessage());

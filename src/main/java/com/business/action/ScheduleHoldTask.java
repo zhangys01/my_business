@@ -38,19 +38,20 @@ public class ScheduleHoldTask {
     @Scheduled(cron = "0/4 * * * * ? ")   //第0秒钟触发，每5秒中触发一次
     public synchronized void configureTasks()throws Exception{
         System.out.println(DateUtil.getTime()+"开始获取等待状态任务");
+        //todo 紧急任务不受限制
+        List<WorkflowOrder>emergencyList = orderService.selectList("8");
+        if (emergencyList!=null&&emergencyList.size()!=0){
+            readyTask(emergencyList,"8",emergencyList.size());
+        }
+        //todo 普通任务
         List<WorkflowOrder>runList = orderService.selectList("2");
         int size = Config.running_number;
         if (runList.size()<size){
             size = size-runList.size();
-            List<WorkflowOrder>emergencyList = orderService.selectList("8");
-            if (emergencyList!=null&&emergencyList.size()!=0){
-                readyTask(emergencyList,"8",size);
-            }
             List<WorkflowOrder>holdList = orderService.selectList("1");
             if (holdList!=null&&holdList.size()!=0){
                 readyTask(holdList,"1",size);
             }
-
         }
     }
     public void readyTask(List<WorkflowOrder> orderList,String orderStatus,int size)throws Exception{
@@ -63,7 +64,7 @@ public class ScheduleHoldTask {
             }
             for (int i=0;i<size;i++){
                 WorkflowOrder order = orderList.get(i);
-                logger.info("发现任务"+order.getTaskMode()+"的任务号是"+order.getTaskSerialNumber());
+                logger.info("发现任务"+order.getTaskMode()+"的任务号是"+order.getTaskSerialNumber()+"任务类型是："+orderStatus);
                 String orderType = order.getOrderType().split("_")[0];
                 order.setOrderStatus("2");
                 switch (orderType){
