@@ -17,7 +17,6 @@ import com.business.enums.ResponseType;
 import com.business.info.ArchiveWorkflowInfo;
 import com.business.info.QATaskWorkflowInfo;
 import com.business.message.DataArchiveRep;
-import com.business.message.QATask;
 import com.business.message.QATaskRep;
 import com.business.message.Response;
 import org.apache.log4j.Logger;
@@ -25,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.nio.file.Files;
@@ -36,8 +34,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Component
-public class ReportUtil {
-    private static final Logger logger = Logger.getLogger(ReportUtil.class);
+public class CheckStatusUtil {
+    private static final Logger logger = Logger.getLogger(CheckStatusUtil.class);
     @Autowired
     private WorkFlowOrderService orderService;
     @Autowired

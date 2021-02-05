@@ -5,7 +5,7 @@ import com.business.Service.WorkFlowOrderService;
 import com.business.entity.ProcessInfo;
 import com.business.entity.WorkflowOrder;
 import com.business.util.DateUtil;
-import com.business.util.ReportUtil;
+import com.business.util.CheckStatusUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +27,7 @@ public class ScheduleRunningDaTask {
     @Autowired
     private ProcessInfoService processInfoService;
     @Resource
-    private ReportUtil reportUtil;
+    private CheckStatusUtil checkStatusUtil;
 
     //添加定时任务
     @Scheduled(cron = "0/4 * * * * ?")   //第0秒钟触发，每5秒中触发一次
@@ -61,12 +61,12 @@ public class ScheduleRunningDaTask {
                     String status2 = "";
                     List<ProcessInfo> L0InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_R0_TO_L0");
                     if (L0InfoList.size()!= 0) {
-                        status2 = reportUtil.getProcessStatus(L0InfoList, order);
+                        status2 = checkStatusUtil.getProcessStatus(L0InfoList, order);
                     }
                     if (status2.equals("success")) {
                         List<ProcessInfo> infoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_L0_TO_CAT");
                         if (infoList.size() != 0) {
-                            reportUtil.modifyTask(infoList, order);
+                            checkStatusUtil.modifyTask(infoList, order);
                         }
                     }
                 }

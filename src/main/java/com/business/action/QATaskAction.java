@@ -11,7 +11,7 @@ import com.business.enums.*;
 import com.business.util.DateUtil;
 import com.business.util.MyHelper;
 import com.business.util.ProcessUtil;
-import com.business.util.ReportUtil;
+import com.business.util.CheckStatusUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class QATaskAction{
     @Resource
     ProcessUtil processUtil;
     @Resource
-    private ReportUtil reportUtil;
+    private CheckStatusUtil checkStatusUtil;
     @Autowired
     private WorkFlowOrderService orderService;
     @Autowired
@@ -381,9 +381,7 @@ public class QATaskAction{
         map.put("PRODUCTID_L1A", L1ProductId);
         map.put("SCENEID", scene.getSceneid());
         map.put("TASKID", t.getJobTaskID());
-
-        File l0Dir = new File(Config.archive_root,"/"+scene.getSatelliteid()+"/"+items[3].substring(0,6)+"/"+items[3]+"/"+t.getJobTaskID());    //条带目录
-
+        File l0Dir = new File(Config.archive_root,"/"+scene.getSceneid().split("_")[0]+"/"+items[3].substring(0,6)+"/"+items[3]+"/"+t.getJobTaskID());    //条带目录
         map.put("METAFILE",scene.getFilepath());
         String day= orderIdSuffix.split("_")[0];
         File L1Dir = null;
@@ -499,7 +497,28 @@ public class QATaskAction{
         String [] numStrs = scene.getSceneid().split("_");
         String numStr = numStrs[numStrs.length-2];
         int num = Integer.parseInt(numStr);
-        File file = new File(l0Dir,scene.getSensorid());
+        logger.info("出啊干起"+scene.getSensorid()+"ldsjlf"+scene.getContent());
+        if (scene.getSensorid().equals("WPM")){
+            logger.info("lodlfjsf"+l0Dir.toString());
+            String []sensorStr = scene.getContent().split(",");
+            for (int i=0;i<sensorStr.length;i++){
+                File file = new File(l0Dir,sensorStr[i]);
+                logger.info(file.toString()+"fsfsf");
+                map = getZY1EandCb4aFile(map,file,num,sensorStr[i]);
+            }
+        }else {
+            File file = new File(l0Dir,scene.getSensorid());
+            map = getZY1EandCb4aFile(map,file,num,scene.getSensorid());
+        }
+        logger.info("fjslf"+map.get("UNPACKFILE_MS"));
+        logger.info("fsfls"+map.get("UNPACKFILE_PA"));
+        map.put("IMAGEFILE_L1A",new File(L1Dir, L1ProductId + ".tiff"));
+        map.put("RPCFILE_L1A", new File(L1Dir, L1ProductId + "."+Constants.EXT_RPC));
+        map.put("L1META",new File(L1Dir, L1ProductId + ".meta.xml"));
+        return map;
+    }
+    private Map getZY1EandCb4aFile(Map<String,Object>map,File file,int num,String sensor)throws Exception{
+
         File [] fileStr = file.listFiles();
         String fileName = "";
         for (int i=0;i<fileStr.length;i++){
@@ -518,7 +537,7 @@ public class QATaskAction{
         }
         String paStr [] = fileName.split(",");
         fileName = orderByName(paStr);
-        switch (scene.getSensorid()){
+        switch (sensor){
             case"MSS":
                 map.put("UNPACKFILE_MS",fileName);
                 break;
@@ -526,10 +545,7 @@ public class QATaskAction{
                 map.put("UNPACKFILE_PA",fileName);
                 break;
         }
-        map.put("IMAGEFILE_L1A",new File(L1Dir, L1ProductId + ".tiff"));
-        map.put("RPCFILE_L1A", new File(L1Dir, L1ProductId + "."+Constants.EXT_RPC));
-        map.put("L1META",new File(L1Dir, L1ProductId + ".meta.xml"));
-        return map;
+        return  map;
     }
     private Map generateProductForZY( Map<String,Object>map,String []names, Mcat scene,File l0Dir,File L1Dir,String L1ProductId)throws Exception{
         if("TLC".equals(scene.getSensorid())){

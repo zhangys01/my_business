@@ -12,7 +12,7 @@ import com.business.entity.ProductUnzipConfig;
 import com.business.entity.WorkflowOrder;
 import com.business.util.DateUtil;
 import com.business.util.MyHelper;
-import com.business.util.ReportUtil;
+import com.business.util.CheckStatusUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +43,7 @@ public class ScheduleProductTask {
     @Resource
     private OracleProcessInfoImpl oracleInfoImpl;
     @Resource
-    private ReportUtil reportUtil;
+    private CheckStatusUtil checkStatusUtil;
 
     //添加定时任务
     @Scheduled(cron = "0/3 * * * * ?")   //第0秒钟触发，每5秒中触发一次
@@ -54,10 +54,8 @@ public class ScheduleProductTask {
             logger.info(DateUtil.getTime()+"当前执行的产品任务数量为："+productList.size());
             if (productList.size()!=0){
                 for (int i =0;i<productList.size();i++){
-
-                }
-                WorkflowOrder order = productList.get(0);
-                order.setEndTime(DateUtil.getTime());
+                    WorkflowOrder order = productList.get(i);
+                    order.setEndTime(DateUtil.getTime());
                     //todo 可能一级生产，也可能是二级生产
                     List<ProcessInfo> infoList = processInfoService.selectProcess(order.getTaskSerialNumber());
                     if (infoList.size() != 0) {
@@ -75,7 +73,7 @@ public class ScheduleProductTask {
                                 ProductUnzipConfig unzipNode = productUnzipConfigList.get(number);
                                 if (order.getProductLevel().equals("L1")) {
                                     String script = Config.product_compress +" "+order.getOut_productdir();
-                                    reportUtil.execShellscript(script, unzipNode.getIp());
+                                    checkStatusUtil.execShellscript(script, unzipNode.getIp());
                                     //todo move成功后，更新Oracle数据库表
                                     NomalProduct l1 = nomalManagerService.getL1product(order.getSceneID());
                                     oracleInfoImpl.delL1Product(order.getSceneID());
@@ -87,11 +85,11 @@ public class ScheduleProductTask {
                                     String targetL1Dir = order.getOut_productdir().split(";")[0].replaceAll("L2", "L1");
                                     MyHelper.CreateDirectory(new File(targetL1Dir));
                                     String script1 = Config.product_compress +" "+targetL1Dir+";"+L1SourceDir;
-                                    reportUtil.execShellscript(script1, unzipNode.getIp());
+                                    checkStatusUtil.execShellscript(script1, unzipNode.getIp());
                                     //todo move成功后，更新数据库表
                                     //todo 执行L2
                                     String script2 = Config.product_compress +" "+order.getOut_productdir();
-                                    reportUtil.execShellscript(script2, unzipNode.getIp());
+                                    checkStatusUtil.execShellscript(script2, unzipNode.getIp());
                                     //todo 修改数据库
                                     NomalProduct l1 = nomalManagerService.getL1product(order.getSceneID());
                                     oracleInfoImpl.delL1Product(order.getSceneID());
@@ -109,6 +107,7 @@ public class ScheduleProductTask {
                             logger.info("PRTask is running");
                         }
                     }
+                }
             }
         }catch (Exception e){
             logger.error("更新产品任务失败："+e.getMessage());
@@ -120,29 +119,29 @@ public class ScheduleProductTask {
         //todo 小于10M 说明压缩未成功，重新压缩一遍
         if (zipDir1.length() < 10240 || !zipDir1.isFile()) {
             logger.info( order.getProductLevel()+"级产品压缩未成功，再执行一遍");
-            reportUtil.toZip1(dir, fos1, true);
+            checkStatusUtil.toZip1(dir, fos1, true);
         } else {
             logger.info(order.getProductLevel()+"级产品压缩成功");
         }
         //todo 使用脚本的方式进行压缩文件
         String script = "cp -rf " + zipDir + " " + targetDir;
         logger.info("打印下移动命令" + script);
-        reportUtil.execShellscript(script, unzipNode.getIp());
+        checkStatusUtil.execShellscript(script, unzipNode.getIp());
         //todo 测试复制命令
         String script1 = "cp -rf " + zipDir + "  /ncsfs/product/";
         logger.info("打印下移动命令" + script1);
-        reportUtil.execShellscript(script1, unzipNode.getIp());
+        checkStatusUtil.execShellscript(script1, unzipNode.getIp());
         //todo du显示文件所占磁盘大小
         String checkScript = "du -s " + targetDir + "/" + dirName + ".zip";
         logger.info("打印下check命令" + checkScript);
-        String result = reportUtil.execShellscript(checkScript, unzipNode.getIp());
+        String result = checkStatusUtil.execShellscript(checkScript, unzipNode.getIp());
         if (result != null) {
             logger.info("Move成功");
         } else if (result == null) {
             logger.info("Move失败,重新Move");
             for (int k = 0; k < Config.move_number; k++) {
-                reportUtil.execShellscript(script, unzipNode.getIp());
-                String result1 = reportUtil.execShellscript(checkScript, unzipNode.getIp());
+                checkStatusUtil.execShellscript(script, unzipNode.getIp());
+                String result1 = checkStatusUtil.execShellscript(checkScript, unzipNode.getIp());
                 if (result1 != null) {
                     break;
                 } else {

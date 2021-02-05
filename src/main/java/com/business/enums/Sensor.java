@@ -50,7 +50,6 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 break;
             case"ZY-1E":
             case"ZY1E":
-            case"CBERS04A":
                 sensorList.add("PAN");
                 sensorList.add("MSS");
                 break;
@@ -59,6 +58,11 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("NAD");
                 sensorList.add("FWD");
                 sensorList.add("BWD");
+                break;
+            case"CBERS04A":
+                sensorList.add("PAN");
+                sensorList.add("MSS");
+                sensorList.add("WPM");
                 break;
         }
         return sensorList;

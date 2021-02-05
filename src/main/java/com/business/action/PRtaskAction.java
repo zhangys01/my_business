@@ -9,7 +9,7 @@ import com.business.enums.ProcessType;
 import com.business.enums.TableName;
 import com.business.util.DateUtil;
 import com.business.util.ProcessUtil;
-import com.business.util.ReportUtil;
+import com.business.util.CheckStatusUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +38,7 @@ public class PRtaskAction {
     @Resource
     private QATaskAction qaTaskAction;
     @Resource
-    private ReportUtil reportUtil;
+    private CheckStatusUtil checkStatusUtil;
     public void doTriggerQATask( WorkflowOrder t) throws Exception {
         //todo 根据订单景ID获取景
         //todo  生产订单没有jobTaskId
