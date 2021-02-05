@@ -37,6 +37,7 @@ public class Config {
     public static String node_password;
     public static String toOMO_author;
     public static String data_absolute_dir;
+    public static String product_compress;
 
     public static File archive_root;
     public static File archive_unzip;
@@ -103,6 +104,7 @@ public class Config {
         move_number = loadIntKey("move_number");
         running_number = loadIntKey("running_number");
         data_absolute_dir = loadStringKey("data_absolute_dir");
+        product_compress = loadStringKey("product_compress");
     }
 
     private static String loadStringKey(String key) throws Exception {

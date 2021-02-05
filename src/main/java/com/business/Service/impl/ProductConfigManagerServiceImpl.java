@@ -6,10 +6,12 @@ import com.business.dao.ProductConfigDao;
 import com.business.entity.ProductUnzipConfig;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductConfigManagerServiceImpl extends ServiceImpl<ProductConfigDao, ProductUnzipConfig> implements ProductConfigManagerService {
     @Override
-    public ProductUnzipConfig findByStatus(String isUnzip) {
+    public List<ProductUnzipConfig> findByStatus(String isUnzip) {
         return baseMapper.findByStatus(isUnzip);
     }
 }
