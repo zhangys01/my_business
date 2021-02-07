@@ -181,13 +181,31 @@ public class DataArchiveAction {
                 unzipMap = generateGfUnzipParaFile(S1File,"1",S2File,"2",t,jobTaskId,signalId,partPath);
                 map.put("TASKBASEFILE1",unzipMap.get("TASKBASEFILE1"));
                 break;
-            default:
+            case"CBERS04A":
                 //todo  生成通道1的解压缩xml
-                unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,DateUtil.getSdfDate(),signalId,partPath);
+                unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,signalId,partPath,"01");
                 unzipConfirm.setStatus(0);
                 unzipConfirm.setTaskId(t.getTaskSerialNumber());
                 int unzipId = unzipConfirmService.selectMaxId();
                 unzipConfirm.setId(unzipId);
+                unzipConfirmService.saveConfrim(unzipConfirm.getId(),unzipConfirm.getActivityId(),unzipConfirm.getCancelActivityId(),unzipConfirm.getStatus());
+                map.put("TASKBASEFILE1",unzipConfirm.getActivityId());
+                //todo  生成通道1的解压缩xml
+                unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,signalId,partPath,"02");
+                unzipConfirm.setStatus(0);
+                unzipConfirm.setTaskId(t.getTaskSerialNumber());
+                int unzipId2 = unzipConfirmService.selectMaxId();
+                unzipConfirm.setId(unzipId2);
+                unzipConfirmService.saveConfrim(unzipConfirm.getId(),unzipConfirm.getActivityId(),unzipConfirm.getCancelActivityId(),unzipConfirm.getStatus());
+                map.put("TASKBASEFILE2",unzipConfirm.getActivityId());
+                break;
+            default:
+                //todo  生成通道1的解压缩xml
+                unzipConfirm = generateBaseParaFile(S1File,"1",S2File,"2",t,jobTaskId,signalId,partPath,"");
+                unzipConfirm.setStatus(0);
+                unzipConfirm.setTaskId(t.getTaskSerialNumber());
+                int unzipId3 = unzipConfirmService.selectMaxId();
+                unzipConfirm.setId(unzipId3);
                 unzipConfirmService.saveConfrim(unzipConfirm.getId(),unzipConfirm.getActivityId(),unzipConfirm.getCancelActivityId(),unzipConfirm.getStatus());
                 map.put("TASKBASEFILE1",unzipConfirm.getActivityId());
                 break;
@@ -258,15 +276,15 @@ public class DataArchiveAction {
         List<String>sensorList1 = Sensor.fromOMOSensor(t.getSatelliteName());
         if (t.getSatelliteName().equals("GF-6")){
             for (int i=0;i<sensorList1.size();i++){
-                l0DataDir = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/"+sensorList1.get(i)));
-                dir = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
+                l0DataDir = new File(MyHelper.ParseStringToPath(Config.archive_unzip,items,jobTaskId,"/"+sensorList1.get(i)));
+                dir = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
                 MyHelper.CreateDirectory(dir);
                 int j = i+1;
                 map.put("OUTPUTDIR"+j, l0DataDir);
             }
         }else if (t.getSatelliteName().equals("GF-7")){
-            l0DataDir = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/"));
-            dir = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/"));
+            l0DataDir = new File(MyHelper.ParseStringToPath(Config.archive_unzip,items,jobTaskId,"/"));
+            dir = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/"));
             MyHelper.CreateDirectory(dir);
             map.put("OUTPUTDIR1", l0DataDir);
         }
@@ -306,12 +324,12 @@ public class DataArchiveAction {
         }
         return map;
     }
-    private UnzipConfirm generateBaseParaFile(File dat1,String chanel1,File dat2,String chanel2,WorkflowOrder t,String jobTaskId,String orderidSuffix,String signalId,String pPath) throws Exception {
+    private UnzipConfirm generateBaseParaFile(File dat1,String chanel1,File dat2,String chanel2,WorkflowOrder t,String jobTaskId,String signalId,String pPath,String CB4ANUmber) throws Exception {
         Map<String, Object> map = new HashMap<>();
         UnzipConfig unzip = unzipConfigService.selectBySaliteName(t.getSatelliteName());
         String[] items = signalId.split("_");
-        File l0DataDir=null,srv=null;
-        File dir=null,srvFile=null;
+        //File l0DataDir=null,srv=null;
+        File dir=null;
         //switch (reportUtil.findBianma(t.getSatelliteName()))
         List<String>sensorList1 = new ArrayList<>();
         if (t.getSatelliteName().equals("ZY-3B")){
@@ -320,16 +338,22 @@ public class DataArchiveAction {
             sensorList1 = Sensor.fromOMOSensor(t.getSatelliteName());
         }
         for (int i=0;i<sensorList1.size();i++){
-            l0DataDir = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/"+sensorList1.get(i)));
-            dir = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
+           // l0DataDir = new File(MyHelper.ParseStringToPath(Config.archive_unzip,items,jobTaskId,"/"+sensorList1.get(i)));
+            dir = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
             MyHelper.CreateDirectory(dir);
             int j = i+1;
-            map.put("OUTPUTDIR"+j, l0DataDir);
+            if (t.getSatelliteName().equals("CBERS04A")){
+                map.put("OUTPUTDIR"+j, dir.toString());
+            }else {
+                String outDir =  MyHelper.ChangeToWindowsPath(dir);
+                map.put("OUTPUTDIR"+j, outDir);
+            }
+
         }
-        //todo 解压缩改好后，这个加上Config.unzip_dir+
-        srv = new File(MyHelper.Creatpathname(Config.archive_unzip,items,jobTaskId,"/srv"));
-        srvFile = new File(MyHelper.Creatpathname(Config.archive_root,items,jobTaskId,"/srv"));
-        MyHelper.CreateDirectory(srvFile);
+        //todo 解压缩改好后，这个加上Config.unzip_dir+,没个卵用，不要他
+        //srv = new File(MyHelper.ParseStringToPath(Config.archive_unzip,items,jobTaskId,"/srv"));
+        //srvFile = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/srv"));
+        //MyHelper.CreateDirectory(srvFile);
         map.put("CRATETIME",DateUtil.getTime());
         map.put("YYYYMMDD_XXXXXX", DateUtil.getSdfDate());
         map.put("ACTIVITYTYPE","NEW");
@@ -365,7 +389,7 @@ public class DataArchiveAction {
             map.put("CHANNEL1",chanel1);
             //todo 暂时定义四个挂载盘的路径，
             if (t.getSatelliteName().equals("ZY1E")){
-                map.put("SYNCPARAFILE2",MyHelper.FilePath(dat1));
+                map.put("SYNCPARAFILE2",MyHelper.ChangeToWindowsPath(dat1));
                 map.put("SKIPHEAD2",unzip.getSkipHeadS1());
                 if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
                     map.put("READBYTES2",dat1.length());
@@ -373,7 +397,7 @@ public class DataArchiveAction {
                     map.put("READBYTES2",unzip.getReadBytesS1());
                 }
             }else {
-                map.put("SYNCPARAFILE1",MyHelper.FilePath(dat1));
+                map.put("SYNCPARAFILE1",MyHelper.ChangeToWindowsPath(dat1));
                 map.put("SKIPHEAD1",unzip.getSkipHeadS1());
                 if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
                     map.put("READBYTES1",dat1.length());
@@ -395,7 +419,7 @@ public class DataArchiveAction {
             }
             map.put("CHANNEL2",chanel2);
             if (t.getSatelliteName().equals("ZY1E")){
-                map.put("SYNCPARAFILE1",MyHelper.FilePath(dat2));
+                map.put("SYNCPARAFILE1",MyHelper.ChangeToWindowsPath(dat2));
                 map.put("SKIPHEAD1",unzip.getSkipHeadS1());
                 if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
                     map.put("READBYTES1",dat2.length());
@@ -403,7 +427,7 @@ public class DataArchiveAction {
                     map.put("READBYTES1",unzip.getReadBytesS1());
                 }
             }else {
-                map.put("SYNCPARAFILE2",MyHelper.FilePath(dat2));
+                map.put("SYNCPARAFILE2",MyHelper.ChangeToWindowsPath(dat2));
                 map.put("SKIPHEAD2",unzip.getSkipHeadS1());
                 if (unzip.getReadBytesS1()==null||unzip.getReadBytesS1().equals("0")){
                     map.put("READBYTES2",dat2.length());
@@ -412,13 +436,27 @@ public class DataArchiveAction {
                 }
             }
         }
-        String sensorList = unzip.getSensorList();
-        map.put("SENSOR1",sensorList.split(";")[0]);
-        map.put("SENSOR2",sensorList.split(";")[1]);
-        map.put("SENSOR3",sensorList.split(";")[2]);
-        map.put("SENSOR4",sensorList.split(";")[3]);
-
-        map.put("OUTPUTDIR",srv);
+        if (!"".equals(CB4ANUmber)) {
+            //todo 区分CB4A和windows版原始数据路径
+            map.put("SYNCPARAFILE1",dat1.toString());
+            map.put("SYNCPARAFILE2",dat2.toString());
+            List<String>cb4aSensor = Sensor.fromOMOSensor(t.getSatelliteName()+CB4ANUmber);
+            for (int i=1;i<cb4aSensor.size()+1;i++){
+                map.put("SENSOR"+i,cb4aSensor.get(i-1));
+            }
+            if (CB4ANUmber.equals("01")){
+                map.put("SENSORLIST",Config.cb4asensorlist1);
+            }else if (CB4ANUmber.equals("02")){
+                map.put("SENSORLIST",Config.cb4asensorlist2);
+            }
+        } else {
+            String sensorList = unzip.getSensorList();
+            map.put("SENSOR1",sensorList.split(";")[0]);
+            map.put("SENSOR2",sensorList.split(";")[1]);
+            map.put("SENSOR3",sensorList.split(";")[2]);
+            map.put("SENSOR4",sensorList.split(";")[3]);
+        }
+        //map.put("OUTPUTDIR",srv);
         UnzipParaTemplate template = null;
         if (dat1==null||dat2==null){
             template = UnzipParaTemplate.Task_UNZIP;

@@ -40,8 +40,8 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
             case"GF-1C":
             case"GF-1D":
                 sensorList.add("PAN1");
-                sensorList.add("PAN2");
                 sensorList.add("MSS1");
+                sensorList.add("PAN2");
                 sensorList.add("MSS2");
                 break;
             case "ZY-3B":
@@ -51,6 +51,14 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
             case"ZY-1E":
             case"ZY1E":
                 sensorList.add("PAN");
+                sensorList.add("PAN");
+                sensorList.add("MSS");
+                sensorList.add("MSS");
+                break;
+            case"CBERS04A":
+                sensorList.add("PAN");
+                sensorList.add("MSS");
+                sensorList.add("PAN");
                 sensorList.add("MSS");
                 break;
             case"ZY302":
@@ -59,10 +67,17 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("FWD");
                 sensorList.add("BWD");
                 break;
-            case"CBERS04A":
-                sensorList.add("PAN");
-                sensorList.add("MSS");
-                sensorList.add("WPM");
+            case"CBERS04A01":
+                sensorList.add("PAN1");
+                sensorList.add("MUX1");
+                sensorList.add("PAN2");
+                sensorList.add("MUX2");
+                break;
+            case"CBERS04A02":
+                sensorList.add("PAN3");
+                sensorList.add("MUX3");
+                sensorList.add("PAN4");
+                sensorList.add("MUX4");
                 break;
         }
         return sensorList;

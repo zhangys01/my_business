@@ -72,11 +72,11 @@ public class MyHelper {
         }
     }
 
-    public static String Creatpathname(File config,String[] items,String jobTaskId,String channal){
+    public static String ParseStringToPath(File config,String[] items,String jobTaskId,String channal){
         return config+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/"+channal;
     }
 
-    public static String FilePath(File dat) {
+    public static String ChangeToWindowsPath(File dat) {
         String filePath = "";
         switch (dat.toString().split("/")[1]) {
             case "KJ125ZL":

@@ -8,7 +8,6 @@ package com.business.enums;
  * To change this template use File | Settings | File Templates.
  */
 public enum  Satellite {  //枚举名：卫星简称
-	
     GF06("GF-6"),
     GF07("GF-7"),
     GF1B("GF-1B"),

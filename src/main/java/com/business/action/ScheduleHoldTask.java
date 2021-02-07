@@ -110,7 +110,6 @@ public class ScheduleHoldTask {
                         if (t.getSatelliteName().equals("ZY-3B"))t.setSatelliteName("ZY302");
                         File receiver_Dir3 = new File(Config.data_dir+"/"+t.getSatelliteName()+"/"+t.getJobTaskID().substring(3,7)+"/"+t.getJobTaskID());
                         //todo 再把卫星给换回来
-                        logger.info(receiver_Dir3.toString()+"鲁宁是这个");
                         if (t.getSatelliteName().equals("ZY302"))t.setSatelliteName("ZY-3B");
                         dataArchiveAction.processDataArchive(receiver_Dir3,t);
                         result = true;

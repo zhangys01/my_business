@@ -38,6 +38,8 @@ public class Config {
     public static String toOMO_author;
     public static String data_absolute_dir;
     public static String product_compress;
+    public static String cb4asensorlist1;
+    public static String cb4asensorlist2;
 
     public static File archive_root;
     public static File archive_unzip;
@@ -105,6 +107,8 @@ public class Config {
         running_number = loadIntKey("running_number");
         data_absolute_dir = loadStringKey("data_absolute_dir");
         product_compress = loadStringKey("product_compress");
+        cb4asensorlist1 = loadStringKey("cb4asensorlist1");
+        cb4asensorlist2 = loadStringKey("cb4asensorlist2");
     }
 
     private static String loadStringKey(String key) throws Exception {
