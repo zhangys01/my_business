@@ -1,6 +1,6 @@
 package com.business;
 
-import com.business.action.ScheduleProductTask;
+import com.business.action.ScheduleRunningPrTask;
 import com.business.action.ScheduleRunningDaTask;
 import com.business.action.ScheduleRunningQaTask;
 import com.business.action.ScheduleHoldTask;
@@ -18,7 +18,7 @@ public class BusinessApplication implements CommandLineRunner {
     @Resource
     ScheduleHoldTask holdTask;
     @Resource
-    ScheduleProductTask productTask;
+    ScheduleRunningPrTask productTask;
     @Resource
     ScheduleRunningDaTask runningDaTask;
     @Resource

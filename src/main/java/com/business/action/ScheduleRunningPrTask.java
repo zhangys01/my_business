@@ -30,8 +30,8 @@ import java.util.Random;
 @Component
 @Configuration
 @EnableScheduling   //打开quartz定时器总开关
-public class ScheduleProductTask {
-    private static final Logger logger = Logger.getLogger(ScheduleProductTask.class);
+public class ScheduleRunningPrTask {
+    private static final Logger logger = Logger.getLogger(ScheduleRunningPrTask.class);
     @Autowired
     private WorkFlowOrderService orderService;
     @Autowired
