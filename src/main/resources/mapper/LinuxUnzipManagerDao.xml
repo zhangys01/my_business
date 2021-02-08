@@ -4,11 +4,11 @@
 <mapper namespace="com.business.dao.LinuxUnzipManagerDao">
 
 	<select id="selectQueueList"  resultType="com.business.entity.LinuxUnzipManager">
-	select taskSerialnumber,prioprity,satelliteName,exshellScript,createTime,status from linux_unzip_manager where status = '0' order by taskPriority desc,createTime
+	select id,taskSerialnumber,prioprity,satelliteName,exshellScript,createTime,status from linux_unzip_manager where status = '0' order by prioprity desc,createTime
 	</select>
 	<!--通过id获取要执行的解压缩-->
 	<select id="selectByTaskId" parameterType="String" resultType="com.business.entity.LinuxUnzipManager">
-		select taskSerialnumber,prioprity,satelliteName,exshellScript,createTime,status from linux_unzip_manager where status = '0' and taskSerialnumber=#{taskSerialnumber}
+		select id,taskSerialnumber,prioprity,satelliteName,exshellScript,createTime,status from linux_unzip_manager where status = '0' and taskSerialnumber=#{taskSerialnumber}
 	</select>
 
 </mapper>

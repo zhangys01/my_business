@@ -55,7 +55,7 @@ public class QATaskAction{
     @Autowired
     private NomalManagerService nomalManagerService;
 
-    public void process(WorkflowOrder order)throws Exception{
+    public synchronized  void process(WorkflowOrder order)throws Exception{
         String taskMode = order.taskMode;
         if (order.getTaskStatus().equals("New")){
             try{
@@ -381,6 +381,15 @@ public class QATaskAction{
         map.put("PRODUCTID_L1A", L1ProductId);
         map.put("SCENEID", scene.getSceneid());
         map.put("TASKID", t.getJobTaskID());
+        //todo CB4A需要的
+        if (scene.getSensorid().equals("MSS")){
+            map.put("BAND","8");
+        }else if (scene.getSensorid().equals("PAN")){
+            map.put("BAND","B1");
+        }else if (scene.getSensorid().equals("WPM")){
+            map.put("BAND","5");
+        }
+        //
         File l0Dir = new File(Config.archive_root,"/"+scene.getSceneid().split("_")[0]+"/"+items[3].substring(0,6)+"/"+items[3]+"/"+t.getJobTaskID());    //条带目录
         map.put("METAFILE",scene.getFilepath());
         String day= orderIdSuffix.split("_")[0];
@@ -389,13 +398,13 @@ public class QATaskAction{
         String outDir = "";
         //todo 判断输出路径是否为空，不为空则指定路径
         if (t.getProductLevel().equals("L1")){
-            if ("".equals(t.getOut_productdir())||t.getOut_productdir()==null){
+            if ("".equals(t.getOutProductdir())||t.getOutProductdir()==null){
                 L1Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId);
                 MyHelper.CreateDirectory(L1Dir);
             }else{
                 L1Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId);
                 MyHelper.CreateDirectory(L1Dir);
-                outDir = t.getOut_productdir()+";"+Config.dataBank_dir+"/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId;
+                outDir = t.getOutProductdir()+";"+Config.dataBank_dir+"/"+scene.getSatelliteid() + "/L1DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L1ProductId;
 
             }
         }else if (t.getProductLevel().equals("L2")){
@@ -425,10 +434,10 @@ public class QATaskAction{
         if (t.getProductLevel().equals("L2")){
             File L2Dir = null;
            //todo 判断输出路径是否为空，为空则默认路径 推翻之前的，重新一版
-            if (t.getOut_productdir()!=null&&!t.getOut_productdir().equals("")){
+            if (t.getOutProductdir()!=null&&!t.getOutProductdir().equals("")){
                 L2Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId);
                 MyHelper.CreateDirectory(L2Dir);
-                outDir = t.getOut_productdir()+";"+Config.dataBank_dir+"/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId;
+                outDir = t.getOutProductdir()+";"+Config.dataBank_dir+"/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId;
             }else{
                 L2Dir = new File(Config.dataBank_dir, "/"+scene.getSatelliteid() + "/L2DATA/" +day.substring(0,6) + "/" + day + "/" + taskId+"/"+L2ProductId);
                 MyHelper.CreateDirectory(L2Dir);
@@ -445,8 +454,11 @@ public class QATaskAction{
 
 
         }
+        logger.info("打印下outDir"+outDir);
         //todo  更新产品的输出地址，压缩的时候用
-        t.setOut_productdir(outDir);
+        t.setOutProductdir(outDir);
+
+        orderService.updateById(t);
         return map;
     }
 

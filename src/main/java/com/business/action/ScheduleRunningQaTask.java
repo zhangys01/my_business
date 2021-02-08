@@ -38,12 +38,12 @@ public class ScheduleRunningQaTask extends Thread {
     private CheckStatusUtil checkStatusUtil;
 
     //添加定时任务
-    @Scheduled(cron = "0/5 * * * * ?")   //第4秒钟触发，每5秒中触发一次
+    @Scheduled(cron = "0/10 * * * * ?")   //第4秒钟触发，每5秒中触发一次
     public synchronized void configureTasks() throws Exception {
          try{
             List<WorkflowOrder> orderList = new ArrayList<>();
             orderList = orderService.selectQataskList("2");
-            logger.info(DateUtil.getTime()+"当前执行中的QA任务数量为"+orderList.size());
+            //logger.info(DateUtil.getTime()+"当前执行中的QA任务数量为"+orderList.size());
             if (orderList.size()!=0){
                 for (int i=0;i<orderList.size();i++){
                     WorkflowOrder order = orderList.get(i);

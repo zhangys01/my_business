@@ -40,7 +40,7 @@ public class DataArchiveAction {
     @Resource
     private ProcessUtil processUtil;
 
-    public void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
+    public synchronized void processDataArchive(File dataTmpDir, WorkflowOrder t) throws Exception {
 
         logger.info("进入归档处理步骤，开始处理归档流程");
         File[] datFiles = dataTmpDir.listFiles(new FileFilter() {
@@ -68,9 +68,11 @@ public class DataArchiveAction {
             if(Channel.S1.getId().equals(items[1])){
                 S1File = f;
                 R0Meta1 = R0Meta.generateR0Meta(t,jobTaskId,S1File);    //生成原始码流元数据文件
+                logger.info("R0Meta1 create Success");
             }else  if(Channel.S2.getId().equals(items[1])){
                 S2File = f;
                 RoMeta2 = R0Meta.generateR0Meta(t,jobTaskId,S2File);    //生成原始码流元数据文件
+                logger.info("R0Meta2 create Success");
             }else{
                 throw new Exception("invalid channel id: "+f);
             }
@@ -329,7 +331,7 @@ public class DataArchiveAction {
         UnzipConfig unzip = unzipConfigService.selectBySaliteName(t.getSatelliteName());
         String[] items = signalId.split("_");
         //File l0DataDir=null,srv=null;
-        File dir=null;
+        File dir=null,srv=null;
         //switch (reportUtil.findBianma(t.getSatelliteName()))
         List<String>sensorList1 = new ArrayList<>();
         if (t.getSatelliteName().equals("ZY-3B")){
@@ -348,10 +350,9 @@ public class DataArchiveAction {
                 String outDir =  MyHelper.ChangeToWindowsPath(dir);
                 map.put("OUTPUTDIR"+j, outDir);
             }
-
         }
         //todo 解压缩改好后，这个加上Config.unzip_dir+,没个卵用，不要他
-        //srv = new File(MyHelper.ParseStringToPath(Config.archive_unzip,items,jobTaskId,"/srv"));
+        srv = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/srv"));
         //srvFile = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/srv"));
         //MyHelper.CreateDirectory(srvFile);
         map.put("CRATETIME",DateUtil.getTime());
@@ -437,6 +438,7 @@ public class DataArchiveAction {
             }
         }
         if (!"".equals(CB4ANUmber)) {
+            map.put("OUTPUTDIR",srv);
             //todo 区分CB4A和windows版原始数据路径
             map.put("SYNCPARAFILE1",dat1.toString());
             map.put("SYNCPARAFILE2",dat2.toString());
@@ -450,13 +452,14 @@ public class DataArchiveAction {
                 map.put("SENSORLIST",Config.cb4asensorlist2);
             }
         } else {
+            map.put("OUTPUTDIR",MyHelper.ChangeToWindowsPath(srv));
             String sensorList = unzip.getSensorList();
             map.put("SENSOR1",sensorList.split(";")[0]);
             map.put("SENSOR2",sensorList.split(";")[1]);
             map.put("SENSOR3",sensorList.split(";")[2]);
             map.put("SENSOR4",sensorList.split(";")[3]);
         }
-        //map.put("OUTPUTDIR",srv);
+
         UnzipParaTemplate template = null;
         if (dat1==null||dat2==null){
             template = UnzipParaTemplate.Task_UNZIP;

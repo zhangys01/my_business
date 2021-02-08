@@ -1,9 +1,6 @@
 package com.business;
 
-import com.business.action.ScheduleRunningPrTask;
-import com.business.action.ScheduleRunningDaTask;
-import com.business.action.ScheduleRunningQaTask;
-import com.business.action.ScheduleHoldTask;
+import com.business.action.*;
 import com.business.config.Config;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +20,8 @@ public class BusinessApplication implements CommandLineRunner {
     ScheduleRunningDaTask runningDaTask;
     @Resource
     ScheduleRunningQaTask runningQaTask;
+    @Resource
+    ScheduleLinuxUnzip scheduleLinuxUnzip;
 
     public static void main(String[] args) {
         SpringApplication.run(BusinessApplication.class, args);
@@ -34,5 +33,6 @@ public class BusinessApplication implements CommandLineRunner {
         productTask.configureTasks();
         runningDaTask.configureTasks();
         runningQaTask.configureTasks();
+        scheduleLinuxUnzip.queueUnzipTasks();
     }
 }

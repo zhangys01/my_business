@@ -76,7 +76,7 @@ public class MyHelper {
         return config+ "/"+items[0]+ "/"+ items[3].substring(0,6) + "/" + items[3] + "/" + jobTaskId+"/"+channal;
     }
 
-    public static String ChangeToWindowsPath(File dat) {
+    public static synchronized String ChangeToWindowsPath(File dat) {
         String filePath = "";
         switch (dat.toString().split("/")[1]) {
             case "KJ125ZL":

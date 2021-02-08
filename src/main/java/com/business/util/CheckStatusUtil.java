@@ -422,28 +422,16 @@ public class CheckStatusUtil {
             oracleInfoImpl.delL0data(order.getJobTaskID());
             oracleInfoImpl.insertL0Data(l0data.get(0));
             //todo 生成DataArchiveRep
-            //WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
             rep = generateDataArchiveRep(order,dataArchive);
             logger.info("生成归档完成通知成功");
-      /*      WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
-            archiveInfo.setReplyfile(rep.replyFileName);
-            archiveInfo.setUpdatetime(DateUtil.getTime());
-            archiveInfo.setReply(1);
-            workFlowDataArchiveService.updateById(archiveInfo);*/
+
         } else if (status.equals("error")) {
             order.setEndTime(DateUtil.getTime());
             order.setOrderStatus("4");
             orderService.updateById(order);
-            //生成DataArchiveRep
-           // WorkFlowDataArchive dataArchive = workFlowDataArchiveService.getDataArchive(order.getTaskSerialNumber());
-
             rep = generateDataArchiveRep(order, dataArchive);
             logger.info("生成归档完成通知成功");
-   /*         WorkFlowDataArchive archiveInfo = new WorkFlowDataArchive();
-            archiveInfo.setReplyfile(rep.replyFileName);
-            archiveInfo.setUpdatetime(DateUtil.getTime());
-            archiveInfo.setReply(1);
-            workFlowDataArchiveService.updateById(archiveInfo);*/
+
         }
     }
 
@@ -470,87 +458,49 @@ public class CheckStatusUtil {
         rep.replyFileName=fileName;
         return rep;
     }
-
-    //todo java输入输出流进行压缩文件
-    public void toZip1(String srcDir, OutputStream out, boolean KeepDirStructure)
-            throws RuntimeException {
-        long start = System.currentTimeMillis();
-        ZipOutputStream zos = null;
+    /**
+     * @param  cmd linux所执行命令
+     * @param  hostAddr 目标主机地址
+     */
+    public String execShellCB4Ascript(String cmd, String hostAddr) {
+        String result = ""; Connection conn = null; Session sess = null;InputStream stdout = null; BufferedReader br = null;
+        StringBuffer buffer = new StringBuffer("exec result:");
+        buffer.append(System.getProperty("line.separtor"));				//换行
         try {
-            logger.info("开始进行压缩");
-            zos = new ZipOutputStream(out);
-            File sourceFile = new File(srcDir);
-            compress(sourceFile, zos, sourceFile.getName(), KeepDirStructure);
-            long end = System.currentTimeMillis();
-            logger.info("压缩完成，耗时：" + (end - start) + " ms");
-        } catch (Exception e) {
-            throw new RuntimeException("zip error from ZipUtils", e);
+            conn = getOpenConnection(hostAddr);
+            sess = conn.openSession();
+            logger.info("开始执行CB4A"+cmd+DateUtil.getTime());
+            sess.execCommand(cmd);
+            stdout = new StreamGobbler(sess.getStdout());
+            br = new BufferedReader(new InputStreamReader(stdout));
+            while(true) {
+                String line = br.readLine();
+                if(line == null) break;
+            }
+            sess.close();
+            conn.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
-            if (zos != null) {
-                try {
-                    zos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                if(stdout != null)
+                    stdout.close();
+                if(br != null)
+                    br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        logger.info("执行完毕"+DateUtil.getTime());
+        return result;
     }
     /**
-     *压缩算法
+     * @param  cmd linux所执行命令
+     * @param  hostAddr 目标主机地址
      */
-    private void compress(File sourceFile, ZipOutputStream zos, String name,
-                                 boolean KeepDirStructure) throws Exception {
-        FileInputStream in = null;
-        try {
-            byte[] buf = new byte[BUFFER_SIZE];
-            if (sourceFile.isFile()) {
-                // 向zip输出流中添加一个zip实体，构造器中name为zip实体的文件的名字
-                zos.putNextEntry(new ZipEntry(name));
-                // copy文件到zip输出流中
-                int len;
-                in = new FileInputStream(sourceFile);
-                while ((len = in.read(buf)) != -1) {
-                    zos.write(buf, 0, len);
-                }
-                // Complete the entry
-                zos.closeEntry();
-            } else {
-                File[] listFiles = sourceFile.listFiles();
-                if (listFiles == null || listFiles.length == 0) {
-                    // 需要保留原来的文件结构时,需要对空文件夹进行处理
-                    if (KeepDirStructure) {
-                        // 空文件夹的处理
-                        zos.putNextEntry(new ZipEntry(name + "/"));
-                        // 没有文件，不需要文件的copy
-                        zos.closeEntry();
-                    }
-                } else {
-                    for (File file : listFiles) {
-                        // 判断是否需要保留原来的文件结构
-                        if (KeepDirStructure) {
-                            // 注意：file.getName()前面需要带上父文件夹的名字加一斜杠,
-                            // 不然最后压缩包中就不能保留原来的文件结构,即：所有文件都跑到压缩包根目录下了
-                            compress(file, zos, name + "/" + file.getName(), KeepDirStructure);
-                        } else {
-                            compress(file, zos, file.getName(), KeepDirStructure);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
-
-    }
-
     public String execShellscript(String cmd, String hostAddr) {
         Connection conn = null;
         Session sess = null;
-        String line = "";
         InputStream stdout = null;
         BufferedReader br = null;
         StringBuffer buffer = new StringBuffer("exec result:");
@@ -562,10 +512,8 @@ public class CheckStatusUtil {
             stdout = new StreamGobbler(sess.getStdout());
             br = new BufferedReader(new InputStreamReader(stdout));
             while(true) {
-                line = br.readLine();
-                if(line != null)
-                    break;
-                else if (line == null)
+                String line = br.readLine();
+                if(line == null)
                     break;
             }
             sess.close();
@@ -582,7 +530,7 @@ public class CheckStatusUtil {
                 e.printStackTrace();
             }
         }
-        return line;
+        return "";
     }
     /***
      * @param host 对应节点的主机地址 10.5.6.223
@@ -591,6 +539,7 @@ public class CheckStatusUtil {
         Connection conn = new Connection(host, Config.node_port);
         conn.connect();// make sure the connection is opened. this is necessary.
         boolean isAuthenticate = conn.authenticateWithPassword(Config.node_username, Config.node_password);
+        logger.info("连接信息 is"+isAuthenticate);
         // authenticate this connection is connected.
         if(isAuthenticate == false)
             throw new IOException("Authentication failed.");

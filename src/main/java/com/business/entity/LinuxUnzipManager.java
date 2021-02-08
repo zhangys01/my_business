@@ -1,14 +1,17 @@
 package com.business.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 /**
  *  * Description: Linux版解压缩队列管理
  *  * <p>
  *  * Created by w_kiven on 2020/12/3 11:17
  */
-@TableName(value = "linux_unzip_manager")
+@TableName("linux_unzip_manager")
 public class LinuxUnzipManager {
+    @TableId(value = "id")
+    private int id;
     @TableField("taskSerialnumber")
     private String taskSerialNumber;
     @TableField("prioprity")
@@ -21,12 +24,20 @@ public class LinuxUnzipManager {
     private String runningNode;
     @TableField("createTime")
     private String createTime;
-    @TableField("createTime")
+    @TableField("beginTime")
     private String beginTime;
-    @TableField("endTimel")
-    private String endTimel;
+    @TableField("endTime")
+    private String endTime;
     @TableField("status")
      private int status;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTaskSerialNumber() {
         return taskSerialNumber;
@@ -84,12 +95,12 @@ public class LinuxUnzipManager {
         this.beginTime = beginTime;
     }
 
-    public String getEndTimel() {
-        return endTimel;
+    public String getEndTime() {
+        return endTime;
     }
 
-    public void setEndTimel(String endTimel) {
-        this.endTimel = endTimel;
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public int getStatus() {

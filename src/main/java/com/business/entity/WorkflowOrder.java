@@ -45,7 +45,7 @@ public class WorkflowOrder {
     @TableField(value = "productLevel")
     private String productLevel;
     @TableField(value = "out_productdir")
-    private String out_productdir;
+    private String outProductdir;
     @TableField(value = "orderStatus")
     private String orderStatus;//Ready进入准备状态Hold（任务单处于排队中）；Running（任务单处于执行中）;Aborted（任务单处于放弃状态）；Completed（任务单处于完成状态）
     @TableField(value = "xmltypedata")
@@ -166,12 +166,12 @@ public class WorkflowOrder {
     }
 
 
-    public String getOut_productdir() {
-        return out_productdir;
+    public String getOutProductdir() {
+        return outProductdir;
     }
 
-    public void setOut_productdir(String out_productdir) {
-        this.out_productdir = out_productdir;
+    public void setOutProductdir(String outProductdir) {
+        this.outProductdir = outProductdir;
     }
 
     public String getResampleKernal() {

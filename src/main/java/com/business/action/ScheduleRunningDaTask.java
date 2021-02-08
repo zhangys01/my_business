@@ -30,12 +30,12 @@ public class ScheduleRunningDaTask {
     private CheckStatusUtil checkStatusUtil;
 
     //添加定时任务
-    @Scheduled(cron = "0/4 * * * * ?")   //第0秒钟触发，每5秒中触发一次
+    @Scheduled(cron = "0/5 * * * * ?")   //第0秒钟触发，每5秒中触发一次
     public synchronized void configureTasks() throws Exception {
         try {
             List<WorkflowOrder> daTaskList = new ArrayList<>();
             daTaskList = orderService.selectDataskList("2");
-            logger.info(DateUtil.getTime()+"当前执行中的归档任务数量为"+daTaskList.size());
+          //  logger.info(DateUtil.getTime()+"当前执行中的归档任务数量为"+daTaskList.size());
             if (daTaskList.size()!=0){
                 for (int i=0;i<daTaskList.size();i++){
                     WorkflowOrder order = daTaskList.get(i);

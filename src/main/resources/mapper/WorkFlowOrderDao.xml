@@ -4,14 +4,14 @@
 <mapper namespace="com.business.dao.WorkFlowOrderDao">
 
 	<select id="selectList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
-	select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,dataSelectType,productLevel,out_productdir,orderStatus,startTime,endTime,logName,logPath,resampleKernal,sceneID,fileResource from workflow_order where orderStatus = #{0} order by taskPriority desc,startTime
+		select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,dataSelectType,productLevel,out_productdir,orderStatus,startTime,endTime,logName,logPath,resampleKernal,sceneID,fileResource from workflow_order where orderStatus = #{0} order by taskPriority desc,startTime
 	</select>
 	<select id="selectProductList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
-	select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,dataSelectType,productLevel,out_productdir,orderStatus,startTime,endTime,logName,logPath,resampleKernal,sceneID,fileResource from workflow_order where orderStatus = #{orderStatus} and taskMode='PRTask'
+		select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,dataSelectType,productLevel,out_productdir,orderStatus,startTime,endTime,logName,logPath,resampleKernal,sceneID,fileResource from workflow_order where orderStatus = #{orderStatus} and taskMode='PRTask' order by taskPriority desc,startTime
 	</select>
 
 	<select id="selectDataskList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
-	select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,out_productdir,orderStatus,startTime,endTime,logName,logPath,sceneID,fileResource from workflow_order where orderStatus = #{orderStatus} and taskMode='DATask'
+	select orderType,taskSerialNumber,taskPriority,taskStatus,taskMode,jobTaskID,satelliteName,orderStatus,startTime,out_productdir,endTime,logName,logPath,sceneID,fileResource from workflow_order where orderStatus = #{orderStatus} and taskMode='DATask'
 	</select>
 
 	<select id="selectQataskList" parameterType="String" resultType="com.business.entity.WorkflowOrder">
