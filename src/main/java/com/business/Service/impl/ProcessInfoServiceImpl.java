@@ -48,4 +48,14 @@ public class ProcessInfoServiceImpl extends ServiceImpl<ProcessInfoDao, ProcessI
         }
         return infoList;
     }
+
+    @Override
+    public ProcessInfo getProcessByOrderId(String orderID) {
+        return baseMapper.getProcessByOrderId(orderID);
+    }
+
+    @Override
+    public ProcessInfo getProcessByPlatfrom(String taskId) {
+        return baseMapper.getProcessByPlatfrom(taskId);
+    }
 }

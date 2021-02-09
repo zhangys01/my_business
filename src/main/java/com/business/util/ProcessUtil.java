@@ -33,13 +33,29 @@ public class ProcessUtil {
        //向工作流引擎提交流程订单，waitTimeout为提交订单后等待记录创建的超时时间(秒)。记录创建成功则返回orderId，否则抛异常。
         logger.info("submitting process-order: " + orderXml);
         String orderId=validateOrder(orderXml);
-        Jedis redis = new Jedis(Config.redisIp,Config.redisPort);
-        redis.lpush("dpps:queue:order",orderXml);
+        String taskId = validTask(orderXml);
+        logger.info(taskId+"fslfjslfjslfjs测试");
+        if (taskId.contains("PR")){
+            ProcessInfo checkInfo = processInfoService.getProcessByPlatfrom(taskId);
+            if (checkInfo!=null){
+                if (checkInfo.getStatus().equals("Running")){
+                    logger.info("该任务已经在执行状态");
+                }
+            }else {
+                Jedis redis = new Jedis(Config.redisIp,Config.redisPort);
+                redis.lpush("dpps:queue:order",orderXml);
+            }
+        }else {
+            Jedis redis = new Jedis(Config.redisIp,Config.redisPort);
+            redis.lpush("dpps:queue:order",orderXml);
+        }
+        //ProcessInfo checkInfo = processInfoService.getById(orderId)
+
         //todo 即使订单不规范、或其它后台错误，ws服务端都不会抛异常，所以并不能认为流程一定创建成功。
         //可通过查询数据库来确认！有一定延迟，需等待片刻！
         long waitTotal = 0;  //秒
         do {
-            ProcessInfo info = processInfoService.getById(orderId);
+            ProcessInfo info = processInfoService.getProcessByOrderId(orderId);
             if (info!=null) {
                logger.info("生成流程"+orderId);
                waitTotal = waitTimeout;
@@ -53,5 +69,10 @@ public class ProcessUtil {
         final DocumentBuilderFactory fact=DocumentBuilderFactory.newInstance();
         Document doc=fact.newDocumentBuilder().parse(new InputSource(new StringReader(orderXml)));
         return doc.getDocumentElement().getAttribute("orderid");
+    }
+    protected static String validTask(String orderXml) throws Exception{
+        final DocumentBuilderFactory fact=DocumentBuilderFactory.newInstance();
+        Document doc=fact.newDocumentBuilder().parse(new InputSource(new StringReader(orderXml)));
+        return doc.getDocumentElement().getAttribute("platform");
     }
 }

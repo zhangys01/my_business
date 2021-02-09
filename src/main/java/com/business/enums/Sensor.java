@@ -60,6 +60,7 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("MSS");
                 sensorList.add("PAN");
                 sensorList.add("MSS");
+                sensorList.add("WPM");
                 break;
             case"ZY302":
                 sensorList.add("NAD");

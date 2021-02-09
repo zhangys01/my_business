@@ -52,6 +52,7 @@ public class PRtaskAction {
         //todo 根据是生产L1A还是都生产构建订单
         String orderXml = "";
         if (t.getProductLevel().equals("L1")) {
+
             switch (t.getSatelliteName()){
                 case "GF-1B":
                 case "GF-1C":
@@ -69,6 +70,7 @@ public class PRtaskAction {
                     break;
             }
             //提交流程
+            Thread.sleep(2000);
             processUtil.submitProcess(orderXml, Config.submit_order_timeout);
         } else {
             switch (t.getSatelliteName()){

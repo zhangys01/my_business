@@ -20,6 +20,7 @@ public class ProcessInfo {
     private String processType;
     @TableField(value = "processName")
     private String processName;
+    @TableField(value = "status")
     private String status;
     private String creator;
     private String platform;

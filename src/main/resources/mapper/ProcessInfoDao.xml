@@ -13,4 +13,12 @@
     <select id="getProcessList" parameterType="String" resultType="com.business.entity.ProcessInfo">
         select processId,orderId,platform,status from pd_processinfo where  platform= #{platfrom} and processType = #{processType} order by createTime
     </select>
+
+    <select id="getProcessByPlatfrom" parameterType="String" resultType="com.business.entity.ProcessInfo">
+        select processId,orderId,platform,status from pd_processinfo where  platform= #{taskId}
+    </select>
+
+    <select id="getProcessByOrderId" parameterType="String" resultType="com.business.entity.ProcessInfo">
+        select processId,orderId,platform,status from pd_processinfo where  orderId= #{orderID}
+    </select>
 </mapper>

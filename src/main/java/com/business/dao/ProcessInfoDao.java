@@ -17,4 +17,6 @@ public interface ProcessInfoDao  extends BaseMapper<ProcessInfo> {
     public ProcessInfo getProcessByName(String platfrom,String processType)throws Exception;
 
     public List<ProcessInfo>getProcessList(String platfrom,String processType)throws Exception;
+    public ProcessInfo getProcessByOrderId(String orderID);
+    ProcessInfo getProcessByPlatfrom(String taskId);
 }

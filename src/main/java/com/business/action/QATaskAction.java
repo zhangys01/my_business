@@ -353,6 +353,7 @@ public class QATaskAction{
             }
             logger.debug("generate process order: \n" + orderXml);
             //提交流程
+            Thread.sleep(1000);
             processUtil.submitProcess(orderXml,Config.submit_order_timeout);
         }
     }
@@ -446,13 +447,13 @@ public class QATaskAction{
             map.put("WORK_DIRL2A",Config.work_dir+"/"+L2ProductId);//工作目录。
             if (map.get("SENSOR").equals("TLC")){
                 map = generateProductL2ForZY(map,scene,L2Dir,L2ProductId);
+            }else if (map.get("SENSOR").equals("WPM")){
+                map = generateProductL2ForCBERS04A(map,scene,L2Dir,L2ProductId);
             }else {
                 map.put("IMAGEFILE_L2A",new File(L2Dir, L2ProductId + ".tiff"));
                 map.put("L2REPORT", new File(L2Dir, L2ProductId + ".report.xml"));
                 map.put("L2META", new File(L2Dir, L2ProductId + ".meta.xml"));
             }
-
-
         }
         logger.info("打印下outDir"+outDir);
         //todo  更新产品的输出地址，压缩的时候用
@@ -461,7 +462,32 @@ public class QATaskAction{
         orderService.updateById(t);
         return map;
     }
-
+//二级for CB4A
+private static Map generateProductL2ForCBERS04A( Map<String,Object>map,Mcat scene,File L2Dir,String L2ProductId)throws Exception{
+    if("WPM".equals(scene.getSensorid())){
+        String []contentStr = scene.getContent().split(",");
+        //todo 单个传感器 处理
+        if (contentStr.length==2){
+            if (contentStr[0].equals("PAN") && contentStr[1].equals("")) {
+                map.put("IMAGEFILE_L2A", new File(L2Dir, L2ProductId + "_PAN.tiff"));
+                map.put("L2REPORT", new File(L2Dir, L2ProductId + "_PAN.report.xml"));
+                map.put("L2META",new File(L2Dir, L2ProductId + "_PAN.meta.xml"));
+            } else if (contentStr[0].equals("") && contentStr[1].equals("MSS")) {
+                map.put("IMAGEFILE_L2A", new File(L2Dir, L2ProductId + "_MSS.tiff"));
+                map.put("L2REPORT", new File(L2Dir, L2ProductId + "_MSS.report.xml"));
+                map.put("L2META",new File(L2Dir, L2ProductId + "_MSS.meta.xml"));
+            } else if (contentStr[0].equals("PAN") && contentStr[1].equals("MSS")) {
+                logger.info("进入PAN,MSS");
+                map.put("IMAGEFILE_L2A", new File(L2Dir, L2ProductId + "_MSS.tiff"));
+                map.put("L2REPORT", new File(L2Dir, L2ProductId + "_MSS.report.xml"));
+                map.put("L2META",new File(L2Dir, L2ProductId + "_MSS.meta.xml" ));
+            }
+        }else {
+            logger.info("Content error.");
+        }
+    }
+    return  map;
+}
     //二级几何校正
     private static Map generateProductL2ForZY(Map<String,Object>map,Mcat scene,File L2Dir,String L2ProductId)throws Exception{
         if("TLC".equals(scene.getSensorid())){
@@ -509,27 +535,47 @@ public class QATaskAction{
         String [] numStrs = scene.getSceneid().split("_");
         String numStr = numStrs[numStrs.length-2];
         int num = Integer.parseInt(numStr);
-        logger.info("出啊干起"+scene.getSensorid()+"ldsjlf"+scene.getContent());
         if (scene.getSensorid().equals("WPM")){
-            logger.info("lodlfjsf"+l0Dir.toString());
             String []sensorStr = scene.getContent().split(",");
             for (int i=0;i<sensorStr.length;i++){
                 File file = new File(l0Dir,sensorStr[i]);
-                logger.info(file.toString()+"fsfsf");
-                map = getZY1EandCb4aFile(map,file,num,sensorStr[i]);
+                map = getZY1EandCb4aFile(map,file,num,sensorStr[i], L1ProductId,scene.getSensorid());
             }
         }else {
             File file = new File(l0Dir,scene.getSensorid());
-            map = getZY1EandCb4aFile(map,file,num,scene.getSensorid());
+            map = getZY1EandCb4aFile(map,file,num,scene.getSensorid(),L1ProductId,scene.getSensorid());
         }
-        logger.info("fjslf"+map.get("UNPACKFILE_MS"));
-        logger.info("fsfls"+map.get("UNPACKFILE_PA"));
-        map.put("IMAGEFILE_L1A",new File(L1Dir, L1ProductId + ".tiff"));
-        map.put("RPCFILE_L1A", new File(L1Dir, L1ProductId + "."+Constants.EXT_RPC));
-        map.put("L1META",new File(L1Dir, L1ProductId + ".meta.xml"));
+        if (!scene.getSatelliteid().equals("CB4A")){
+            map.put("IMAGEFILE_L1A",new File(L1Dir, L1ProductId + ".tiff"));
+            map.put("RPCFILE_L1A", new File(L1Dir, L1ProductId + "."+Constants.EXT_RPC));
+            map.put("L1META",new File(L1Dir, L1ProductId + ".meta.xml"));
+        }else {
+            String[] contentStr = scene.getContent().split(",");
+            logger.info("Content is "+scene.getContent());
+            //todo 单个传感器 处理
+            if (contentStr.length == 2) {
+                if (contentStr[0].equals("PAN") && contentStr[1].equals("")) {
+                    map.put("IMAGEFILE_L1A", new File(L1Dir, L1ProductId + "_PAN.tiff")+",");
+                    map.put("RPCFILE_L1A", new File(L1Dir, L1ProductId + "_PAN.rpb")+",");
+                    map.put("L1META",new File(L1Dir, L1ProductId + "_PAN.meta.xml"));
+                    map.put("IMAGEFILE_L1A_Q63", new File(L1Dir, L1ProductId + "_PAN.tiff"));
+                } else if (contentStr[0].equals("") && contentStr[1].equals("MSS")) {
+                    map.put("IMAGEFILE_L1A", ","+new File(L1Dir, L1ProductId + "_MSS.tiff"));
+                    map.put("RPCFILE_L1A", ","+new File(L1Dir, L1ProductId + "_MSS.rpb"));
+                    map.put("L1META",new File(L1Dir, L1ProductId + "_MSS.meta.xml"));
+                    map.put("IMAGEFILE_L1A_Q63", ","+new File(L1Dir, L1ProductId + "_MSS.tiff"));
+                } else if (contentStr[0].equals("PAN") && contentStr[1].equals("MSS")) {
+                    logger.info("进入PAN,MSS");
+                    map.put("IMAGEFILE_L1A", new File(L1Dir, L1ProductId + "_PAN.tiff")+","+new File(L1Dir, L1ProductId + "_MSS.tiff"));
+                    map.put("RPCFILE_L1A", new File(L1Dir, L1ProductId + "_PAN.rpb" )+","+new File(L1Dir, L1ProductId + "_MSS.rpb"));
+                    map.put("L1META",new File(L1Dir, L1ProductId + "_MSS.meta.xml"));
+                    map.put("IMAGEFILE_L1A_Q63",new File(L1Dir, L1ProductId + "_MSS.tiff"));
+                }
+            }
+        }
         return map;
     }
-    private Map getZY1EandCb4aFile(Map<String,Object>map,File file,int num,String sensor)throws Exception{
+    private Map getZY1EandCb4aFile(Map<String,Object>map,File file,int num,String sensor,String L1ProductId,String sensorID)throws Exception{
 
         File [] fileStr = file.listFiles();
         String fileName = "";
@@ -557,6 +603,7 @@ public class QATaskAction{
                 map.put("UNPACKFILE_PA",fileName);
                 break;
         }
+
         return  map;
     }
     private Map generateProductForZY( Map<String,Object>map,String []names, Mcat scene,File l0Dir,File L1Dir,String L1ProductId)throws Exception{
