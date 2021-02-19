@@ -68,6 +68,10 @@ public class ScheduleRunningQaTask extends Thread {
                         case "CBERS04A":
                             satelliteName = "CB4A";
                             break;
+                        case "HJ2A":
+                        case "HJ2B":
+                            satelliteName = "HJ";
+                            break;
                     }
                     if (order.getTaskMode().equals("Q61")) {
                         dataInfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), "KJ125_R0_TO_R0REPORT");

@@ -224,6 +224,11 @@ public class DataArchiveInqAction {
                             sa=getSensorData("2m8mTDICCD",i.dataStarttime,i.dataEndtime);
                             sas.add(sa);
                             break;
+                        case HJ2A:
+                        case HJ2B:
+                            sa=getSensorData("16m",i.dataStarttime,i.dataEndtime);
+                            sas.add(sa);
+                            break;
                         case CBERS04A:
                         case CB4A:
                             sa=getSensorData("WPM",i.dataStarttime,i.dataEndtime);

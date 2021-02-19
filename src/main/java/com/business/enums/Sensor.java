@@ -21,7 +21,6 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
     AHSI,
     VIMS; //多光谱VIMS
 
-
     public static List<String> fromOMOSensor(String satellite) {
         List<String>sensorList = new ArrayList<>();
         switch (satellite){
@@ -55,6 +54,9 @@ public enum Sensor {    //内部用传感器标识。注意，不同于运管接
                 sensorList.add("MSS");
                 sensorList.add("MSS");
                 break;
+            case"HJ-2A":
+            case"HJ-2B":
+                sensorList.add("16M");
             case"CBERS04A":
                 sensorList.add("PAN");
                 sensorList.add("MSS");

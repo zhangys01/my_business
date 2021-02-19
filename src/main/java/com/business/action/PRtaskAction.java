@@ -68,6 +68,10 @@ public class PRtaskAction {
                 case "CBERS04A":
                     orderXml = ProcessType.CB4A_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
                     break;
+                case "HJ-2A":
+                case "HJ-2B":
+                    orderXml = ProcessType.HJ_CAT_TO_L1A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
             }
             //提交流程
             Thread.sleep(2000);
@@ -87,6 +91,10 @@ public class PRtaskAction {
                     break;
                 case "CBERS04A":
                     orderXml = ProcessType.CB4A_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
+                    break;
+                case "HJ-2A":
+                case "HJ-2B":
+                    orderXml = ProcessType.HJ_CAT_TO_L2A.generateOrderXml(qaTaskAction.generateCommonOrderParamsForGF_CAT_TO_L2A(DateUtil.getSdfDate(), t, s));
                     break;
             }
             logger.debug("generate process order: \n" + orderXml);

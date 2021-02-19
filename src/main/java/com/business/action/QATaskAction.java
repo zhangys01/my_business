@@ -344,8 +344,12 @@ public class QATaskAction{
                     orderXml = ProcessType.ZY1E_Q63_CAT_TO_L2A.generateOrderXml(map);
                     break;
                 case "CB4A":
-                case"CBERS04A":
+                case "CBERS04A":
                     orderXml = ProcessType.CB4A_Q63_CAT_TO_L2A.generateOrderXml(map);
+                    break;
+                case "HJ2A":
+                case "HJ2B":
+                    orderXml = ProcessType.HJ_Q63_CAT_TO_L2A.generateOrderXml(map);
                     break;
                 case"CASEARTH":
                     orderXml = ProcessType.CAS_Q63_CAT_TO_L2A.generateOrderXml(map);
@@ -425,7 +429,9 @@ public class QATaskAction{
                 map = generateProductForZY(map,names,scene,l0Dir,L1Dir,L1ProductId);
                 break;
             case "ZY-1E":
-            case"CBERS04A":
+            case "CBERS04A":
+            case "HJ-2A":
+            case "HJ-2B":
                 map = generateOrderParamsForZY1E(map,names,scene,l0Dir,L1Dir,L1ProductId);
                 break;
         }

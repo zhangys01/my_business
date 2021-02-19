@@ -57,6 +57,10 @@ public class ScheduleRunningDaTask {
                         case "CBERS04A":
                             satelliteName = "CB4A";
                             break;
+                        case "HJ-2A":
+                        case "HJ-2B":
+                            satelliteName = "HJ";
+                            break;
                     }
                     String status2 = "";
                     List<ProcessInfo> L0InfoList = processInfoService.getProcessList(order.getTaskSerialNumber(), satelliteName+"_R0_TO_L0");

@@ -36,6 +36,7 @@ public enum ProcessType {   //预先定义的流程名
     ZY3_R0_TO_L0,
     ZY1E_R0_TO_L0,
     CB4A_R0_TO_L0,
+    HJ_R0_TO_L0,
 
     KJ125_R0_TO_R0REPORT,
     ZY3B_CAT_TO_L1A,
@@ -50,6 +51,9 @@ public enum ProcessType {   //预先定义的流程名
     CB4A_CAT_TO_L1A,
     CB4A_CAT_TO_L2A,
     CB4A_Q63_CAT_TO_L2A,
+    HJ_CAT_TO_L1A,
+    HJ_CAT_TO_L2A,
+    HJ_Q63_CAT_TO_L2A,
 
     KJ125_Q61_62_63_QAReport,
     KJ125_Q64,

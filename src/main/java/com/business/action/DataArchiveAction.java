@@ -106,6 +106,13 @@ public class DataArchiveAction {
                     unzipOrderXml = ProcessType.CB4A_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
                 }
                 break;
+            case "HJ-2A":
+            case "HJ-2B":
+                dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"HJ_R0_TO_L0");
+                if(dataInfoList.size()==0) {
+                    unzipOrderXml = ProcessType.HJ_R0_TO_L0.generateOrderXml(generateOrderParamsForGF_R0_TO_L0(R0Meta1, RoMeta2, t, satellite, jobTaskId, S1File, S2File));
+                }
+                break;
             case"CASEARTH":
                 dataInfoList = processInfoService.getProcessList(t.getTaskSerialNumber(),"CAS_R0_TO_L0");
                 if(dataInfoList.size()==0) {
@@ -344,7 +351,7 @@ public class DataArchiveAction {
             dir = new File(MyHelper.ParseStringToPath(Config.archive_root,items,jobTaskId,"/"+sensorList1.get(i)));
             MyHelper.CreateDirectory(dir);
             int j = i+1;
-            if (t.getSatelliteName().equals("CBERS04A")){
+            if (t.getSatelliteName().equals("CBERS04A")||t.getSatelliteName().equals("HJ-2A")||t.getSatelliteName().equals("HJ-2B")){
                 map.put("OUTPUTDIR"+j, dir.toString());
             }else {
                 String outDir =  MyHelper.ChangeToWindowsPath(dir);
