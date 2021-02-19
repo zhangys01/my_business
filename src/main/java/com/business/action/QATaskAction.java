@@ -394,7 +394,7 @@ public class QATaskAction{
         }else if (scene.getSensorid().equals("WPM")){
             map.put("BAND","5");
         }else if (scene.getSensorid().equals("16M")){
-            map.put("BAND","8");
+            map.put("BAND","5");
         }
         //
         File l0Dir = new File(Config.archive_root,"/"+scene.getSceneid().split("_")[0]+"/"+items[3].substring(0,6)+"/"+items[3]+"/"+t.getJobTaskID());    //条带目录
